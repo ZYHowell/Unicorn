@@ -17,7 +17,7 @@ void eraseWhiteSpace(std::string &line) {
     line.erase(0, line.find_first_not_of(ignores));
 }
 
-std::vector<std::string> instTypeEnum({"Label", "Inst", "PseudoInst", "Derivate", "Uncertain"});
+std::vector<std::string> instTypeEnum({"Label", "Inst", "PseudoInst", "Directive", "Uncertain"});
 
 Line_t parseInst(std::string &line) {
     //todo: split the first node, if it is ".string", find two '"' to get the content. 
@@ -28,19 +28,20 @@ Line_t parseInst(std::string &line) {
     size_t next = line.find_first_of(split);
     std::vector<std::string> &tokens = ret.tokens;
     tokens.push_back(line.substr(current, next - current));
-    if (tokens[0] == ".string") {
+    if (tokens[0] == ".string" || ".file") {
         current = line.find_first_of("\"", next);
         next = line.find_first_of("\"", current + 1);
         if (next > current) tokens.emplace_back(line.substr(current, next - current + 1));
-        else assert(false); //only one ", cannot be a string; 
+        else assert(false); //only one '"', cannot be a string; 
         if (next != std::string::npos)
             if (line.find_first_not_of(ignores, next + 1) != std::string::npos) assert(false);
+        ret.type = Directive;
     }
     else {
         const std::string &command = tokens[0];
-        if (command[0] == '.') ret.type = Derivate;
+        if (command[0] == '.') ret.type = Directive;
         else {
-            if (command == "call" || command == "tail" || command == "li") ret.type = PseudoInst;
+            if (pseudoInst.count(command)) ret.type = PseudoInst;
             else ret.type = Inst;
         }
         while(next != std::string::npos) {
@@ -92,7 +93,7 @@ std::vector<Line_t>&& parse(std::string &file) {
             eraseWhiteSpace(line);
         }
 
-        //now parse inst/psudo-inst/derivate
+        //now parse inst/psudo-inst/directive
         ret.push_back(parseInst(line));
         #ifdef DEBUG_Mode
         //todo

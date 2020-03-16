@@ -2,8 +2,6 @@
 #define assembler_parser_h
 #include "includes.h"
 
-enum lineType {Label, Inst, PseudoInst, Derivate};
-
 struct Line_t{
     std::vector<std::string> tokens;
     lineType type;
@@ -15,5 +13,9 @@ std::vector<Line_t>&& parse(std::string &file);
 
 const char* ignores = " \t\n\r\f\v";
 const char* split = " \t,";
+
+std::unordered_set<std::string> longPseudoInst = {"li", "call", "tail"};
+std::unordered_set<std::string> pseudoInst = {"li", "mv", "nop", "call", "tail"};
+//todo: more psudoInst
 
 #endif
