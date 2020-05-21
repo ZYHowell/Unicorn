@@ -3,7 +3,23 @@
 
 #include "assembler.h"
 
-
+inline int addrAlign(int currentAddr, int align) {
+    return (currentAddr % align) ? currentAddr : 
+                                   (currentAddr / align + 1) * align;
+}
+inline bool correctAlignment(int align) {
+    while(align > 1) {
+        if (align % 2) return false;
+        align /= 2;
+    }
+}
+/*
+ * todo: 
+ * 1. pass 1: what if the label represents an object? wait till pass 2 or handle it here? 
+ * 2. pass 2: remove some local symbols. 
+ * 3. necessary support for directives like .type, .size
+ * 4. optional support for directives like .equ
+ */
 void assemble(std::string fileName) {
     std::ifstream F(fileName);
     std::string file((std::istreambuf_iterator<char>(F)),
@@ -53,11 +69,11 @@ void assemble(std::string fileName) {
                     currentSection = sectionType::data;
                 } else if (directive == ".align" || directive == ".p2align") {
                     auto bit = 1 << std::atoi(tokens.at(1).c_str());
-                    //todo: alignment
+                    sectionStorage.resize(addrAlign(sectionStorage.size(), bit));
                 } else if (directive == ".balign") {
                     auto bit = std::atoi(tokens.at(1).c_str());
-                    //todo: check if it is power of 2
-                    //todo: alignment
+                    if (!correctAlignment(bit)) std::cerr << "bit align not power of 2" << std::endl;
+                    else sectionStorage.resize(addrAlign(sectionStorage.size(), bit));
                 } else if (directive == ".global") {
                     gSymbols.emplace(tokens[1], symbolType::Error);
                 } else if (directive == ".string" || directive == ".asciz") {
@@ -101,14 +117,17 @@ void assemble(std::string fileName) {
             }
             case PseudoInst: {
                 assert(currentSection == sectionType::text);
+                //todo: unfold, and may add some label here 
                 if (longPseudoInst.count(line.tokens[0])) sectionStorage.resize(sectionStorage.size() + 8);
                 else sectionStorage.resize(sectionStorage.size() + 4);
                 break;
             }
         }
     }
+    //todo: re-calculate the address of labels
 
     //pass-2: emitting instructions and data
+    bool isText = false;
     for (auto &line : context) {
         switch(line.type) {
             case Directive: {
@@ -116,12 +135,13 @@ void assemble(std::string fileName) {
                 auto &directive = tokens[0];
                 if (directive == ".align" || directive == ".p2align") {}
                 else if (directive == ".balign") {}
-                else if (directive == ".text") {}
-                else if (directive == ".bss") {}
-                else if (directive == ".data") {}
-                else if (directive == ".rodata") {}
+                else if (directive == ".text") isText = true;
+                else if (directive == ".bss") isText = false;
+                else if (directive == ".data") isText = false;
+                else if (directive == ".rodata") isText = false;
                 else if (directive == ".section") {
-                    if (tokens[1] == ".text") {}
+                    if (tokens[1] == ".text") isText = true;
+                    else isText = false;
                 }
                 break;
             }
