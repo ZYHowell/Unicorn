@@ -27,6 +27,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitStart(AssembParser::StartContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitRtype(AssembParser::RtypeContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -48,6 +52,10 @@ public:
   }
 
   virtual antlrcpp::Any visitJtype(AssembParser::JtypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitLtype(AssembParser::LtypeContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -108,6 +116,10 @@ public:
   }
 
   virtual antlrcpp::Any visitIgnore(AssembParser::IgnoreContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitImm(AssembParser::ImmContext *ctx) override {
     return visitChildren(ctx);
   }
 

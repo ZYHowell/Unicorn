@@ -15,11 +15,11 @@ public:
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
     T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
-    T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, T__25 = 26, 
-    IgnoreDirective = 27, Section = 28, Type = 29, Rop = 30, Iop = 31, Sop = 32, 
-    Bop = 33, Uop = 34, Jop = 35, Reg = 36, Symbol = 37, Label = 38, StringLiteral = 39, 
-    Imm = 40, Relocation = 41, Integer = 42, DecimalInteger = 43, Whitespace = 44, 
-    Newline = 45, LineComment = 46
+    T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, Section = 26, 
+    Type = 27, Rop = 28, Iop = 29, Sop = 30, Bop = 31, Uop = 32, Jop = 33, 
+    Lop = 34, Reg = 35, Symbol = 36, StringLiteral = 37, Relocation = 38, 
+    Integer = 39, DecimalInteger = 40, IgnoreDirective = 41, Whitespace = 42, 
+    Newline = 43, LineComment = 44
   };
 
   AssembLexer(antlr4::CharStream *input);

@@ -23,6 +23,9 @@ public:
   virtual void enterInst(AssembParser::InstContext *ctx) = 0;
   virtual void exitInst(AssembParser::InstContext *ctx) = 0;
 
+  virtual void enterStart(AssembParser::StartContext *ctx) = 0;
+  virtual void exitStart(AssembParser::StartContext *ctx) = 0;
+
   virtual void enterRtype(AssembParser::RtypeContext *ctx) = 0;
   virtual void exitRtype(AssembParser::RtypeContext *ctx) = 0;
 
@@ -40,6 +43,9 @@ public:
 
   virtual void enterJtype(AssembParser::JtypeContext *ctx) = 0;
   virtual void exitJtype(AssembParser::JtypeContext *ctx) = 0;
+
+  virtual void enterLtype(AssembParser::LtypeContext *ctx) = 0;
+  virtual void exitLtype(AssembParser::LtypeContext *ctx) = 0;
 
   virtual void enterMv(AssembParser::MvContext *ctx) = 0;
   virtual void exitMv(AssembParser::MvContext *ctx) = 0;
@@ -85,6 +91,9 @@ public:
 
   virtual void enterIgnore(AssembParser::IgnoreContext *ctx) = 0;
   virtual void exitIgnore(AssembParser::IgnoreContext *ctx) = 0;
+
+  virtual void enterImm(AssembParser::ImmContext *ctx) = 0;
+  virtual void exitImm(AssembParser::ImmContext *ctx) = 0;
 
 
 };

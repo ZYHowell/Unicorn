@@ -25,6 +25,8 @@ public:
 
     virtual antlrcpp::Any visitInst(AssembParser::InstContext *context) = 0;
 
+    virtual antlrcpp::Any visitStart(AssembParser::StartContext *context) = 0;
+
     virtual antlrcpp::Any visitRtype(AssembParser::RtypeContext *context) = 0;
 
     virtual antlrcpp::Any visitItype(AssembParser::ItypeContext *context) = 0;
@@ -36,6 +38,8 @@ public:
     virtual antlrcpp::Any visitUtype(AssembParser::UtypeContext *context) = 0;
 
     virtual antlrcpp::Any visitJtype(AssembParser::JtypeContext *context) = 0;
+
+    virtual antlrcpp::Any visitLtype(AssembParser::LtypeContext *context) = 0;
 
     virtual antlrcpp::Any visitMv(AssembParser::MvContext *context) = 0;
 
@@ -66,6 +70,8 @@ public:
     virtual antlrcpp::Any visitAsciz(AssembParser::AscizContext *context) = 0;
 
     virtual antlrcpp::Any visitIgnore(AssembParser::IgnoreContext *context) = 0;
+
+    virtual antlrcpp::Any visitImm(AssembParser::ImmContext *context) = 0;
 
 
 };

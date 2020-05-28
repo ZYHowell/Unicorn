@@ -85,12 +85,11 @@ AssembParser::FileContext* AssembParser::file() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(25);
+    setState(31);
     _errHandler->sync(this);
     _la = _input->LA(1);
     while ((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << AssembParser::T__3)
-      | (1ULL << AssembParser::T__4)
+      ((1ULL << _la) & ((1ULL << AssembParser::T__4)
       | (1ULL << AssembParser::T__5)
       | (1ULL << AssembParser::T__6)
       | (1ULL << AssembParser::T__7)
@@ -111,22 +110,23 @@ AssembParser::FileContext* AssembParser::file() {
       | (1ULL << AssembParser::T__22)
       | (1ULL << AssembParser::T__23)
       | (1ULL << AssembParser::T__24)
-      | (1ULL << AssembParser::T__25)
-      | (1ULL << AssembParser::IgnoreDirective)
       | (1ULL << AssembParser::Section)
       | (1ULL << AssembParser::Rop)
       | (1ULL << AssembParser::Iop)
       | (1ULL << AssembParser::Sop)
       | (1ULL << AssembParser::Bop)
       | (1ULL << AssembParser::Uop)
-      | (1ULL << AssembParser::Jop))) != 0)) {
-      setState(22);
+      | (1ULL << AssembParser::Jop)
+      | (1ULL << AssembParser::Lop)
+      | (1ULL << AssembParser::Symbol)
+      | (1ULL << AssembParser::IgnoreDirective))) != 0)) {
+      setState(28);
       line();
-      setState(27);
+      setState(33);
       _errHandler->sync(this);
       _la = _input->LA(1);
     }
-    setState(28);
+    setState(34);
     match(AssembParser::EOF);
    
   }
@@ -153,8 +153,12 @@ AssembParser::PseudoInstContext* AssembParser::LineContext::pseudoInst() {
   return getRuleContext<AssembParser::PseudoInstContext>(0);
 }
 
-AssembParser::DerictiveContext* AssembParser::LineContext::derictive() {
-  return getRuleContext<AssembParser::DerictiveContext>(0);
+AssembParser::DirectiveContext* AssembParser::LineContext::directive() {
+  return getRuleContext<AssembParser::DirectiveContext>(0);
+}
+
+AssembParser::StartContext* AssembParser::LineContext::start() {
+  return getRuleContext<AssembParser::StartContext>(0);
 }
 
 
@@ -190,60 +194,37 @@ AssembParser::LineContext* AssembParser::line() {
     exitRule();
   });
   try {
-    setState(33);
+    setState(40);
     _errHandler->sync(this);
-    switch (_input->LA(1)) {
-      case AssembParser::Rop:
-      case AssembParser::Iop:
-      case AssembParser::Sop:
-      case AssembParser::Bop:
-      case AssembParser::Uop:
-      case AssembParser::Jop: {
-        enterOuterAlt(_localctx, 1);
-        setState(30);
-        inst();
-        break;
-      }
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 1, _ctx)) {
+    case 1: {
+      enterOuterAlt(_localctx, 1);
+      setState(36);
+      inst();
+      break;
+    }
 
-      case AssembParser::T__3:
-      case AssembParser::T__4:
-      case AssembParser::T__5:
-      case AssembParser::T__6:
-      case AssembParser::T__7:
-      case AssembParser::T__8:
-      case AssembParser::T__9:
-      case AssembParser::T__10:
-      case AssembParser::T__11:
-      case AssembParser::T__12:
-      case AssembParser::T__13:
-      case AssembParser::T__14:
-      case AssembParser::T__15:
-      case AssembParser::T__16:
-      case AssembParser::T__17:
-      case AssembParser::T__18:
-      case AssembParser::T__19:
-      case AssembParser::T__20: {
-        enterOuterAlt(_localctx, 2);
-        setState(31);
-        pseudoInst();
-        break;
-      }
+    case 2: {
+      enterOuterAlt(_localctx, 2);
+      setState(37);
+      pseudoInst();
+      break;
+    }
 
-      case AssembParser::T__21:
-      case AssembParser::T__22:
-      case AssembParser::T__23:
-      case AssembParser::T__24:
-      case AssembParser::T__25:
-      case AssembParser::IgnoreDirective:
-      case AssembParser::Section: {
-        enterOuterAlt(_localctx, 3);
-        setState(32);
-        derictive();
-        break;
-      }
+    case 3: {
+      enterOuterAlt(_localctx, 3);
+      setState(38);
+      directive();
+      break;
+    }
 
-    default:
-      throw NoViableAltException(this);
+    case 4: {
+      enterOuterAlt(_localctx, 4);
+      setState(39);
+      start();
+      break;
+    }
+
     }
    
   }
@@ -286,6 +267,10 @@ AssembParser::JtypeContext* AssembParser::InstContext::jtype() {
   return getRuleContext<AssembParser::JtypeContext>(0);
 }
 
+AssembParser::LtypeContext* AssembParser::InstContext::ltype() {
+  return getRuleContext<AssembParser::LtypeContext>(0);
+}
+
 
 size_t AssembParser::InstContext::getRuleIndex() const {
   return AssembParser::RuleInst;
@@ -319,54 +304,120 @@ AssembParser::InstContext* AssembParser::inst() {
     exitRule();
   });
   try {
-    setState(41);
+    setState(49);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case AssembParser::Rop: {
         enterOuterAlt(_localctx, 1);
-        setState(35);
+        setState(42);
         rtype();
         break;
       }
 
       case AssembParser::Iop: {
         enterOuterAlt(_localctx, 2);
-        setState(36);
+        setState(43);
         itype();
         break;
       }
 
       case AssembParser::Sop: {
         enterOuterAlt(_localctx, 3);
-        setState(37);
+        setState(44);
         stype();
         break;
       }
 
       case AssembParser::Bop: {
         enterOuterAlt(_localctx, 4);
-        setState(38);
+        setState(45);
         btype();
         break;
       }
 
       case AssembParser::Uop: {
         enterOuterAlt(_localctx, 5);
-        setState(39);
+        setState(46);
         utype();
         break;
       }
 
       case AssembParser::Jop: {
         enterOuterAlt(_localctx, 6);
-        setState(40);
+        setState(47);
         jtype();
+        break;
+      }
+
+      case AssembParser::Lop: {
+        enterOuterAlt(_localctx, 7);
+        setState(48);
+        ltype();
         break;
       }
 
     default:
       throw NoViableAltException(this);
     }
+   
+  }
+  catch (RecognitionException &e) {
+    _errHandler->reportError(this, e);
+    _localctx->exception = std::current_exception();
+    _errHandler->recover(this, _localctx->exception);
+  }
+
+  return _localctx;
+}
+
+//----------------- StartContext ------------------------------------------------------------------
+
+AssembParser::StartContext::StartContext(ParserRuleContext *parent, size_t invokingState)
+  : ParserRuleContext(parent, invokingState) {
+}
+
+tree::TerminalNode* AssembParser::StartContext::Symbol() {
+  return getToken(AssembParser::Symbol, 0);
+}
+
+
+size_t AssembParser::StartContext::getRuleIndex() const {
+  return AssembParser::RuleStart;
+}
+
+void AssembParser::StartContext::enterRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<AssembListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->enterStart(this);
+}
+
+void AssembParser::StartContext::exitRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<AssembListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->exitStart(this);
+}
+
+
+antlrcpp::Any AssembParser::StartContext::accept(tree::ParseTreeVisitor *visitor) {
+  if (auto parserVisitor = dynamic_cast<AssembVisitor*>(visitor))
+    return parserVisitor->visitStart(this);
+  else
+    return visitor->visitChildren(this);
+}
+
+AssembParser::StartContext* AssembParser::start() {
+  StartContext *_localctx = _tracker.createInstance<StartContext>(_ctx, getState());
+  enterRule(_localctx, 6, AssembParser::RuleStart);
+
+  auto onExit = finally([=] {
+    exitRule();
+  });
+  try {
+    enterOuterAlt(_localctx, 1);
+    setState(51);
+    match(AssembParser::Symbol);
+    setState(52);
+    match(AssembParser::T__0);
    
   }
   catch (RecognitionException &e) {
@@ -423,24 +474,24 @@ antlrcpp::Any AssembParser::RtypeContext::accept(tree::ParseTreeVisitor *visitor
 
 AssembParser::RtypeContext* AssembParser::rtype() {
   RtypeContext *_localctx = _tracker.createInstance<RtypeContext>(_ctx, getState());
-  enterRule(_localctx, 6, AssembParser::RuleRtype);
+  enterRule(_localctx, 8, AssembParser::RuleRtype);
 
   auto onExit = finally([=] {
     exitRule();
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(43);
+    setState(54);
     match(AssembParser::Rop);
-    setState(44);
+    setState(55);
     dynamic_cast<RtypeContext *>(_localctx)->rd = match(AssembParser::Reg);
-    setState(45);
-    match(AssembParser::T__0);
-    setState(46);
+    setState(56);
+    match(AssembParser::T__1);
+    setState(57);
     dynamic_cast<RtypeContext *>(_localctx)->src1 = match(AssembParser::Reg);
-    setState(47);
-    match(AssembParser::T__0);
-    setState(48);
+    setState(58);
+    match(AssembParser::T__1);
+    setState(59);
     dynamic_cast<RtypeContext *>(_localctx)->src2 = match(AssembParser::Reg);
    
   }
@@ -471,8 +522,8 @@ tree::TerminalNode* AssembParser::ItypeContext::Reg(size_t i) {
   return getToken(AssembParser::Reg, i);
 }
 
-tree::TerminalNode* AssembParser::ItypeContext::Imm() {
-  return getToken(AssembParser::Imm, 0);
+AssembParser::ImmContext* AssembParser::ItypeContext::imm() {
+  return getRuleContext<AssembParser::ImmContext>(0);
 }
 
 
@@ -502,25 +553,25 @@ antlrcpp::Any AssembParser::ItypeContext::accept(tree::ParseTreeVisitor *visitor
 
 AssembParser::ItypeContext* AssembParser::itype() {
   ItypeContext *_localctx = _tracker.createInstance<ItypeContext>(_ctx, getState());
-  enterRule(_localctx, 8, AssembParser::RuleItype);
+  enterRule(_localctx, 10, AssembParser::RuleItype);
 
   auto onExit = finally([=] {
     exitRule();
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(50);
+    setState(61);
     match(AssembParser::Iop);
-    setState(51);
+    setState(62);
     dynamic_cast<ItypeContext *>(_localctx)->rd = match(AssembParser::Reg);
-    setState(52);
-    match(AssembParser::T__0);
-    setState(53);
+    setState(63);
+    match(AssembParser::T__1);
+    setState(64);
     dynamic_cast<ItypeContext *>(_localctx)->src = match(AssembParser::Reg);
-    setState(54);
-    match(AssembParser::T__0);
-    setState(55);
-    dynamic_cast<ItypeContext *>(_localctx)->imm = match(AssembParser::Imm);
+    setState(65);
+    match(AssembParser::T__1);
+    setState(66);
+    dynamic_cast<ItypeContext *>(_localctx)->im = imm();
    
   }
   catch (RecognitionException &e) {
@@ -550,8 +601,8 @@ tree::TerminalNode* AssembParser::StypeContext::Reg(size_t i) {
   return getToken(AssembParser::Reg, i);
 }
 
-tree::TerminalNode* AssembParser::StypeContext::Integer() {
-  return getToken(AssembParser::Integer, 0);
+AssembParser::ImmContext* AssembParser::StypeContext::imm() {
+  return getRuleContext<AssembParser::ImmContext>(0);
 }
 
 
@@ -581,27 +632,27 @@ antlrcpp::Any AssembParser::StypeContext::accept(tree::ParseTreeVisitor *visitor
 
 AssembParser::StypeContext* AssembParser::stype() {
   StypeContext *_localctx = _tracker.createInstance<StypeContext>(_ctx, getState());
-  enterRule(_localctx, 10, AssembParser::RuleStype);
+  enterRule(_localctx, 12, AssembParser::RuleStype);
 
   auto onExit = finally([=] {
     exitRule();
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(57);
+    setState(68);
     match(AssembParser::Sop);
-    setState(58);
+    setState(69);
     dynamic_cast<StypeContext *>(_localctx)->value = match(AssembParser::Reg);
-    setState(59);
-    match(AssembParser::T__0);
-    setState(60);
-    dynamic_cast<StypeContext *>(_localctx)->offset = match(AssembParser::Integer);
-    setState(61);
+    setState(70);
     match(AssembParser::T__1);
-    setState(62);
-    dynamic_cast<StypeContext *>(_localctx)->addr = match(AssembParser::Reg);
-    setState(63);
+    setState(71);
+    dynamic_cast<StypeContext *>(_localctx)->offset = imm();
+    setState(72);
     match(AssembParser::T__2);
+    setState(73);
+    dynamic_cast<StypeContext *>(_localctx)->addr = match(AssembParser::Reg);
+    setState(74);
+    match(AssembParser::T__3);
    
   }
   catch (RecognitionException &e) {
@@ -631,8 +682,8 @@ tree::TerminalNode* AssembParser::BtypeContext::Reg(size_t i) {
   return getToken(AssembParser::Reg, i);
 }
 
-tree::TerminalNode* AssembParser::BtypeContext::Label() {
-  return getToken(AssembParser::Label, 0);
+tree::TerminalNode* AssembParser::BtypeContext::Symbol() {
+  return getToken(AssembParser::Symbol, 0);
 }
 
 
@@ -662,25 +713,25 @@ antlrcpp::Any AssembParser::BtypeContext::accept(tree::ParseTreeVisitor *visitor
 
 AssembParser::BtypeContext* AssembParser::btype() {
   BtypeContext *_localctx = _tracker.createInstance<BtypeContext>(_ctx, getState());
-  enterRule(_localctx, 12, AssembParser::RuleBtype);
+  enterRule(_localctx, 14, AssembParser::RuleBtype);
 
   auto onExit = finally([=] {
     exitRule();
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(65);
+    setState(76);
     match(AssembParser::Bop);
-    setState(66);
+    setState(77);
     dynamic_cast<BtypeContext *>(_localctx)->src1 = match(AssembParser::Reg);
-    setState(67);
-    match(AssembParser::T__0);
-    setState(68);
+    setState(78);
+    match(AssembParser::T__1);
+    setState(79);
     dynamic_cast<BtypeContext *>(_localctx)->src2 = match(AssembParser::Reg);
-    setState(69);
-    match(AssembParser::T__0);
-    setState(70);
-    dynamic_cast<BtypeContext *>(_localctx)->label = match(AssembParser::Label);
+    setState(80);
+    match(AssembParser::T__1);
+    setState(81);
+    dynamic_cast<BtypeContext *>(_localctx)->label = match(AssembParser::Symbol);
    
   }
   catch (RecognitionException &e) {
@@ -706,8 +757,8 @@ tree::TerminalNode* AssembParser::UtypeContext::Reg() {
   return getToken(AssembParser::Reg, 0);
 }
 
-tree::TerminalNode* AssembParser::UtypeContext::Imm() {
-  return getToken(AssembParser::Imm, 0);
+AssembParser::ImmContext* AssembParser::UtypeContext::imm() {
+  return getRuleContext<AssembParser::ImmContext>(0);
 }
 
 
@@ -737,21 +788,21 @@ antlrcpp::Any AssembParser::UtypeContext::accept(tree::ParseTreeVisitor *visitor
 
 AssembParser::UtypeContext* AssembParser::utype() {
   UtypeContext *_localctx = _tracker.createInstance<UtypeContext>(_ctx, getState());
-  enterRule(_localctx, 14, AssembParser::RuleUtype);
+  enterRule(_localctx, 16, AssembParser::RuleUtype);
 
   auto onExit = finally([=] {
     exitRule();
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(72);
+    setState(83);
     match(AssembParser::Uop);
-    setState(73);
+    setState(84);
     dynamic_cast<UtypeContext *>(_localctx)->rd = match(AssembParser::Reg);
-    setState(74);
-    match(AssembParser::T__0);
-    setState(75);
-    dynamic_cast<UtypeContext *>(_localctx)->imm = match(AssembParser::Imm);
+    setState(85);
+    match(AssembParser::T__1);
+    setState(86);
+    dynamic_cast<UtypeContext *>(_localctx)->im = imm();
    
   }
   catch (RecognitionException &e) {
@@ -777,8 +828,8 @@ tree::TerminalNode* AssembParser::JtypeContext::Reg() {
   return getToken(AssembParser::Reg, 0);
 }
 
-tree::TerminalNode* AssembParser::JtypeContext::Imm() {
-  return getToken(AssembParser::Imm, 0);
+AssembParser::ImmContext* AssembParser::JtypeContext::imm() {
+  return getRuleContext<AssembParser::ImmContext>(0);
 }
 
 
@@ -808,21 +859,102 @@ antlrcpp::Any AssembParser::JtypeContext::accept(tree::ParseTreeVisitor *visitor
 
 AssembParser::JtypeContext* AssembParser::jtype() {
   JtypeContext *_localctx = _tracker.createInstance<JtypeContext>(_ctx, getState());
-  enterRule(_localctx, 16, AssembParser::RuleJtype);
+  enterRule(_localctx, 18, AssembParser::RuleJtype);
 
   auto onExit = finally([=] {
     exitRule();
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(77);
+    setState(88);
     match(AssembParser::Jop);
-    setState(78);
+    setState(89);
     dynamic_cast<JtypeContext *>(_localctx)->rd = match(AssembParser::Reg);
-    setState(79);
-    match(AssembParser::T__0);
-    setState(80);
-    dynamic_cast<JtypeContext *>(_localctx)->imm = match(AssembParser::Imm);
+    setState(90);
+    match(AssembParser::T__1);
+    setState(91);
+    dynamic_cast<JtypeContext *>(_localctx)->im = imm();
+   
+  }
+  catch (RecognitionException &e) {
+    _errHandler->reportError(this, e);
+    _localctx->exception = std::current_exception();
+    _errHandler->recover(this, _localctx->exception);
+  }
+
+  return _localctx;
+}
+
+//----------------- LtypeContext ------------------------------------------------------------------
+
+AssembParser::LtypeContext::LtypeContext(ParserRuleContext *parent, size_t invokingState)
+  : ParserRuleContext(parent, invokingState) {
+}
+
+tree::TerminalNode* AssembParser::LtypeContext::Lop() {
+  return getToken(AssembParser::Lop, 0);
+}
+
+std::vector<tree::TerminalNode *> AssembParser::LtypeContext::Reg() {
+  return getTokens(AssembParser::Reg);
+}
+
+tree::TerminalNode* AssembParser::LtypeContext::Reg(size_t i) {
+  return getToken(AssembParser::Reg, i);
+}
+
+AssembParser::ImmContext* AssembParser::LtypeContext::imm() {
+  return getRuleContext<AssembParser::ImmContext>(0);
+}
+
+
+size_t AssembParser::LtypeContext::getRuleIndex() const {
+  return AssembParser::RuleLtype;
+}
+
+void AssembParser::LtypeContext::enterRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<AssembListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->enterLtype(this);
+}
+
+void AssembParser::LtypeContext::exitRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<AssembListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->exitLtype(this);
+}
+
+
+antlrcpp::Any AssembParser::LtypeContext::accept(tree::ParseTreeVisitor *visitor) {
+  if (auto parserVisitor = dynamic_cast<AssembVisitor*>(visitor))
+    return parserVisitor->visitLtype(this);
+  else
+    return visitor->visitChildren(this);
+}
+
+AssembParser::LtypeContext* AssembParser::ltype() {
+  LtypeContext *_localctx = _tracker.createInstance<LtypeContext>(_ctx, getState());
+  enterRule(_localctx, 20, AssembParser::RuleLtype);
+
+  auto onExit = finally([=] {
+    exitRule();
+  });
+  try {
+    enterOuterAlt(_localctx, 1);
+    setState(93);
+    match(AssembParser::Lop);
+    setState(94);
+    dynamic_cast<LtypeContext *>(_localctx)->rd = match(AssembParser::Reg);
+    setState(95);
+    match(AssembParser::T__1);
+    setState(96);
+    dynamic_cast<LtypeContext *>(_localctx)->im = imm();
+    setState(97);
+    match(AssembParser::T__2);
+    setState(98);
+    dynamic_cast<LtypeContext *>(_localctx)->rs = match(AssembParser::Reg);
+    setState(99);
+    match(AssembParser::T__3);
    
   }
   catch (RecognitionException &e) {
@@ -926,8 +1058,8 @@ antlrcpp::Any AssembParser::LaContext::accept(tree::ParseTreeVisitor *visitor) {
 }
 //----------------- JpContext ------------------------------------------------------------------
 
-tree::TerminalNode* AssembParser::JpContext::Label() {
-  return getToken(AssembParser::Label, 0);
+tree::TerminalNode* AssembParser::JpContext::Symbol() {
+  return getToken(AssembParser::Symbol, 0);
 }
 
 AssembParser::JpContext::JpContext(PseudoInstContext *ctx) { copyFrom(ctx); }
@@ -980,6 +1112,10 @@ antlrcpp::Any AssembParser::SzContext::accept(tree::ParseTreeVisitor *visitor) {
 }
 //----------------- LdContext ------------------------------------------------------------------
 
+tree::TerminalNode* AssembParser::LdContext::Lop() {
+  return getToken(AssembParser::Lop, 0);
+}
+
 tree::TerminalNode* AssembParser::LdContext::Reg() {
   return getToken(AssembParser::Reg, 0);
 }
@@ -1013,8 +1149,8 @@ tree::TerminalNode* AssembParser::BzContext::Reg() {
   return getToken(AssembParser::Reg, 0);
 }
 
-tree::TerminalNode* AssembParser::BzContext::Label() {
-  return getToken(AssembParser::Label, 0);
+tree::TerminalNode* AssembParser::BzContext::Symbol() {
+  return getToken(AssembParser::Symbol, 0);
 }
 
 AssembParser::BzContext::BzContext(PseudoInstContext *ctx) { copyFrom(ctx); }
@@ -1071,8 +1207,8 @@ tree::TerminalNode* AssembParser::LiContext::Reg() {
   return getToken(AssembParser::Reg, 0);
 }
 
-tree::TerminalNode* AssembParser::LiContext::Imm() {
-  return getToken(AssembParser::Imm, 0);
+AssembParser::ImmContext* AssembParser::LiContext::imm() {
+  return getRuleContext<AssembParser::ImmContext>(0);
 }
 
 AssembParser::LiContext::LiContext(PseudoInstContext *ctx) { copyFrom(ctx); }
@@ -1096,167 +1232,155 @@ antlrcpp::Any AssembParser::LiContext::accept(tree::ParseTreeVisitor *visitor) {
 }
 AssembParser::PseudoInstContext* AssembParser::pseudoInst() {
   PseudoInstContext *_localctx = _tracker.createInstance<PseudoInstContext>(_ctx, getState());
-  enterRule(_localctx, 18, AssembParser::RulePseudoInst);
+  enterRule(_localctx, 22, AssembParser::RulePseudoInst);
   size_t _la = 0;
 
   auto onExit = finally([=] {
     exitRule();
   });
   try {
-    setState(111);
+    setState(130);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case AssembParser::T__3: {
+      case AssembParser::T__4: {
         _localctx = dynamic_cast<PseudoInstContext *>(_tracker.createInstance<AssembParser::MvContext>(_localctx));
         enterOuterAlt(_localctx, 1);
-        setState(82);
-        match(AssembParser::T__3);
-        setState(83);
+        setState(101);
+        match(AssembParser::T__4);
+        setState(102);
         dynamic_cast<MvContext *>(_localctx)->rd = match(AssembParser::Reg);
-        setState(84);
-        match(AssembParser::T__0);
-        setState(85);
+        setState(103);
+        match(AssembParser::T__1);
+        setState(104);
         dynamic_cast<MvContext *>(_localctx)->src = match(AssembParser::Reg);
         break;
       }
 
-      case AssembParser::T__4: {
+      case AssembParser::T__5: {
         _localctx = dynamic_cast<PseudoInstContext *>(_tracker.createInstance<AssembParser::LiContext>(_localctx));
         enterOuterAlt(_localctx, 2);
-        setState(86);
-        match(AssembParser::T__4);
-        setState(87);
-        dynamic_cast<LiContext *>(_localctx)->rd = match(AssembParser::Reg);
-        setState(88);
-        match(AssembParser::T__0);
-        setState(89);
-        dynamic_cast<LiContext *>(_localctx)->src = match(AssembParser::Imm);
-        break;
-      }
-
-      case AssembParser::T__5: {
-        _localctx = dynamic_cast<PseudoInstContext *>(_tracker.createInstance<AssembParser::RetContext>(_localctx));
-        enterOuterAlt(_localctx, 3);
-        setState(90);
+        setState(105);
         match(AssembParser::T__5);
+        setState(106);
+        dynamic_cast<LiContext *>(_localctx)->rd = match(AssembParser::Reg);
+        setState(107);
+        match(AssembParser::T__1);
+        setState(108);
+        dynamic_cast<LiContext *>(_localctx)->src = imm();
         break;
       }
 
       case AssembParser::T__6: {
-        _localctx = dynamic_cast<PseudoInstContext *>(_tracker.createInstance<AssembParser::JpContext>(_localctx));
-        enterOuterAlt(_localctx, 4);
-        setState(91);
+        _localctx = dynamic_cast<PseudoInstContext *>(_tracker.createInstance<AssembParser::RetContext>(_localctx));
+        enterOuterAlt(_localctx, 3);
+        setState(109);
         match(AssembParser::T__6);
-        setState(92);
-        dynamic_cast<JpContext *>(_localctx)->label = match(AssembParser::Label);
         break;
       }
 
-      case AssembParser::T__7:
-      case AssembParser::T__8:
-      case AssembParser::T__9: {
+      case AssembParser::T__7: {
+        _localctx = dynamic_cast<PseudoInstContext *>(_tracker.createInstance<AssembParser::JpContext>(_localctx));
+        enterOuterAlt(_localctx, 4);
+        setState(110);
+        match(AssembParser::T__7);
+        setState(111);
+        dynamic_cast<JpContext *>(_localctx)->label = match(AssembParser::Symbol);
+        break;
+      }
+
+      case AssembParser::Lop: {
         _localctx = dynamic_cast<PseudoInstContext *>(_tracker.createInstance<AssembParser::LdContext>(_localctx));
         enterOuterAlt(_localctx, 5);
-        setState(93);
-        _la = _input->LA(1);
-        if (!((((_la & ~ 0x3fULL) == 0) &&
-          ((1ULL << _la) & ((1ULL << AssembParser::T__7)
-          | (1ULL << AssembParser::T__8)
-          | (1ULL << AssembParser::T__9))) != 0))) {
-        _errHandler->recoverInline(this);
-        }
-        else {
-          _errHandler->reportMatch(this);
-          consume();
-        }
-        setState(94);
+        setState(112);
+        match(AssembParser::Lop);
+        setState(113);
         dynamic_cast<LdContext *>(_localctx)->rd = match(AssembParser::Reg);
-        setState(95);
-        match(AssembParser::T__0);
-        setState(96);
+        setState(114);
+        match(AssembParser::T__1);
+        setState(115);
         dynamic_cast<LdContext *>(_localctx)->src = match(AssembParser::Symbol);
         break;
       }
 
-      case AssembParser::T__10: {
+      case AssembParser::T__8: {
         _localctx = dynamic_cast<PseudoInstContext *>(_tracker.createInstance<AssembParser::LaContext>(_localctx));
         enterOuterAlt(_localctx, 6);
-        setState(97);
-        match(AssembParser::T__10);
-        setState(98);
+        setState(116);
+        match(AssembParser::T__8);
+        setState(117);
         dynamic_cast<LaContext *>(_localctx)->rd = match(AssembParser::Reg);
-        setState(99);
-        match(AssembParser::T__0);
-        setState(100);
+        setState(118);
+        match(AssembParser::T__1);
+        setState(119);
         dynamic_cast<LaContext *>(_localctx)->src = match(AssembParser::Symbol);
         break;
       }
 
-      case AssembParser::T__11: {
+      case AssembParser::T__9: {
         _localctx = dynamic_cast<PseudoInstContext *>(_tracker.createInstance<AssembParser::CallContext>(_localctx));
         enterOuterAlt(_localctx, 7);
-        setState(101);
-        match(AssembParser::T__11);
-        setState(102);
+        setState(120);
+        match(AssembParser::T__9);
+        setState(121);
         match(AssembParser::Symbol);
         break;
       }
 
+      case AssembParser::T__10:
+      case AssembParser::T__11:
       case AssembParser::T__12:
-      case AssembParser::T__13:
-      case AssembParser::T__14:
-      case AssembParser::T__15: {
+      case AssembParser::T__13: {
         _localctx = dynamic_cast<PseudoInstContext *>(_tracker.createInstance<AssembParser::SzContext>(_localctx));
         enterOuterAlt(_localctx, 8);
-        setState(103);
+        setState(122);
         _la = _input->LA(1);
         if (!((((_la & ~ 0x3fULL) == 0) &&
-          ((1ULL << _la) & ((1ULL << AssembParser::T__12)
-          | (1ULL << AssembParser::T__13)
-          | (1ULL << AssembParser::T__14)
-          | (1ULL << AssembParser::T__15))) != 0))) {
+          ((1ULL << _la) & ((1ULL << AssembParser::T__10)
+          | (1ULL << AssembParser::T__11)
+          | (1ULL << AssembParser::T__12)
+          | (1ULL << AssembParser::T__13))) != 0))) {
         _errHandler->recoverInline(this);
         }
         else {
           _errHandler->reportMatch(this);
           consume();
         }
-        setState(104);
+        setState(123);
         dynamic_cast<SzContext *>(_localctx)->rd = match(AssembParser::Reg);
-        setState(105);
-        match(AssembParser::T__0);
-        setState(106);
+        setState(124);
+        match(AssembParser::T__1);
+        setState(125);
         dynamic_cast<SzContext *>(_localctx)->src = match(AssembParser::Reg);
         break;
       }
 
+      case AssembParser::T__14:
+      case AssembParser::T__15:
       case AssembParser::T__16:
       case AssembParser::T__17:
-      case AssembParser::T__18:
-      case AssembParser::T__19:
-      case AssembParser::T__20: {
+      case AssembParser::T__18: {
         _localctx = dynamic_cast<PseudoInstContext *>(_tracker.createInstance<AssembParser::BzContext>(_localctx));
         enterOuterAlt(_localctx, 9);
-        setState(107);
+        setState(126);
         _la = _input->LA(1);
         if (!((((_la & ~ 0x3fULL) == 0) &&
-          ((1ULL << _la) & ((1ULL << AssembParser::T__16)
+          ((1ULL << _la) & ((1ULL << AssembParser::T__14)
+          | (1ULL << AssembParser::T__15)
+          | (1ULL << AssembParser::T__16)
           | (1ULL << AssembParser::T__17)
-          | (1ULL << AssembParser::T__18)
-          | (1ULL << AssembParser::T__19)
-          | (1ULL << AssembParser::T__20))) != 0))) {
+          | (1ULL << AssembParser::T__18))) != 0))) {
         _errHandler->recoverInline(this);
         }
         else {
           _errHandler->reportMatch(this);
           consume();
         }
-        setState(108);
+        setState(127);
         dynamic_cast<BzContext *>(_localctx)->src = match(AssembParser::Reg);
-        setState(109);
-        match(AssembParser::T__0);
-        setState(110);
-        dynamic_cast<BzContext *>(_localctx)->label = match(AssembParser::Label);
+        setState(128);
+        match(AssembParser::T__1);
+        setState(129);
+        dynamic_cast<BzContext *>(_localctx)->label = match(AssembParser::Symbol);
         break;
       }
 
@@ -1274,18 +1398,18 @@ AssembParser::PseudoInstContext* AssembParser::pseudoInst() {
   return _localctx;
 }
 
-//----------------- DerictiveContext ------------------------------------------------------------------
+//----------------- DirectiveContext ------------------------------------------------------------------
 
-AssembParser::DerictiveContext::DerictiveContext(ParserRuleContext *parent, size_t invokingState)
+AssembParser::DirectiveContext::DirectiveContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
 
-size_t AssembParser::DerictiveContext::getRuleIndex() const {
-  return AssembParser::RuleDerictive;
+size_t AssembParser::DirectiveContext::getRuleIndex() const {
+  return AssembParser::RuleDirective;
 }
 
-void AssembParser::DerictiveContext::copyFrom(DerictiveContext *ctx) {
+void AssembParser::DirectiveContext::copyFrom(DirectiveContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
 }
 
@@ -1295,7 +1419,7 @@ tree::TerminalNode* AssembParser::SizeContext::Integer() {
   return getToken(AssembParser::Integer, 0);
 }
 
-AssembParser::SizeContext::SizeContext(DerictiveContext *ctx) { copyFrom(ctx); }
+AssembParser::SizeContext::SizeContext(DirectiveContext *ctx) { copyFrom(ctx); }
 
 void AssembParser::SizeContext::enterRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<AssembListener *>(listener);
@@ -1320,7 +1444,7 @@ tree::TerminalNode* AssembParser::IgnoreContext::IgnoreDirective() {
   return getToken(AssembParser::IgnoreDirective, 0);
 }
 
-AssembParser::IgnoreContext::IgnoreContext(DerictiveContext *ctx) { copyFrom(ctx); }
+AssembParser::IgnoreContext::IgnoreContext(DirectiveContext *ctx) { copyFrom(ctx); }
 
 void AssembParser::IgnoreContext::enterRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<AssembListener *>(listener);
@@ -1345,7 +1469,7 @@ tree::TerminalNode* AssembParser::SectionContext::Section() {
   return getToken(AssembParser::Section, 0);
 }
 
-AssembParser::SectionContext::SectionContext(DerictiveContext *ctx) { copyFrom(ctx); }
+AssembParser::SectionContext::SectionContext(DirectiveContext *ctx) { copyFrom(ctx); }
 
 void AssembParser::SectionContext::enterRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<AssembListener *>(listener);
@@ -1374,7 +1498,7 @@ tree::TerminalNode* AssembParser::TypeContext::Symbol() {
   return getToken(AssembParser::Symbol, 0);
 }
 
-AssembParser::TypeContext::TypeContext(DerictiveContext *ctx) { copyFrom(ctx); }
+AssembParser::TypeContext::TypeContext(DirectiveContext *ctx) { copyFrom(ctx); }
 
 void AssembParser::TypeContext::enterRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<AssembListener *>(listener);
@@ -1399,7 +1523,7 @@ tree::TerminalNode* AssembParser::AlignContext::Integer() {
   return getToken(AssembParser::Integer, 0);
 }
 
-AssembParser::AlignContext::AlignContext(DerictiveContext *ctx) { copyFrom(ctx); }
+AssembParser::AlignContext::AlignContext(DirectiveContext *ctx) { copyFrom(ctx); }
 
 void AssembParser::AlignContext::enterRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<AssembListener *>(listener);
@@ -1424,7 +1548,7 @@ tree::TerminalNode* AssembParser::AscizContext::StringLiteral() {
   return getToken(AssembParser::StringLiteral, 0);
 }
 
-AssembParser::AscizContext::AscizContext(DerictiveContext *ctx) { copyFrom(ctx); }
+AssembParser::AscizContext::AscizContext(DirectiveContext *ctx) { copyFrom(ctx); }
 
 void AssembParser::AscizContext::enterRule(tree::ParseTreeListener *listener) {
   auto parserListener = dynamic_cast<AssembListener *>(listener);
@@ -1443,90 +1567,171 @@ antlrcpp::Any AssembParser::AscizContext::accept(tree::ParseTreeVisitor *visitor
   else
     return visitor->visitChildren(this);
 }
-AssembParser::DerictiveContext* AssembParser::derictive() {
-  DerictiveContext *_localctx = _tracker.createInstance<DerictiveContext>(_ctx, getState());
-  enterRule(_localctx, 20, AssembParser::RuleDerictive);
+AssembParser::DirectiveContext* AssembParser::directive() {
+  DirectiveContext *_localctx = _tracker.createInstance<DirectiveContext>(_ctx, getState());
+  enterRule(_localctx, 24, AssembParser::RuleDirective);
   size_t _la = 0;
 
   auto onExit = finally([=] {
     exitRule();
   });
   try {
-    setState(125);
+    setState(144);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case AssembParser::Section: {
-        _localctx = dynamic_cast<DerictiveContext *>(_tracker.createInstance<AssembParser::SectionContext>(_localctx));
+        _localctx = dynamic_cast<DirectiveContext *>(_tracker.createInstance<AssembParser::SectionContext>(_localctx));
         enterOuterAlt(_localctx, 1);
-        setState(113);
+        setState(132);
         match(AssembParser::Section);
         break;
       }
 
-      case AssembParser::T__21: {
-        _localctx = dynamic_cast<DerictiveContext *>(_tracker.createInstance<AssembParser::TypeContext>(_localctx));
+      case AssembParser::T__19: {
+        _localctx = dynamic_cast<DirectiveContext *>(_tracker.createInstance<AssembParser::TypeContext>(_localctx));
         enterOuterAlt(_localctx, 2);
-        setState(114);
-        match(AssembParser::T__21);
-        setState(115);
+        setState(133);
+        match(AssembParser::T__19);
+        setState(134);
         dynamic_cast<TypeContext *>(_localctx)->symbol = match(AssembParser::Symbol);
-        setState(116);
-        match(AssembParser::T__0);
-        setState(117);
+        setState(135);
+        match(AssembParser::T__1);
+        setState(136);
         match(AssembParser::Type);
         break;
       }
 
-      case AssembParser::T__22:
-      case AssembParser::T__23: {
-        _localctx = dynamic_cast<DerictiveContext *>(_tracker.createInstance<AssembParser::AlignContext>(_localctx));
+      case AssembParser::T__20:
+      case AssembParser::T__21: {
+        _localctx = dynamic_cast<DirectiveContext *>(_tracker.createInstance<AssembParser::AlignContext>(_localctx));
         enterOuterAlt(_localctx, 3);
-        setState(118);
+        setState(137);
         _la = _input->LA(1);
-        if (!(_la == AssembParser::T__22
+        if (!(_la == AssembParser::T__20
 
-        || _la == AssembParser::T__23)) {
+        || _la == AssembParser::T__21)) {
         _errHandler->recoverInline(this);
         }
         else {
           _errHandler->reportMatch(this);
           consume();
         }
-        setState(119);
+        setState(138);
         match(AssembParser::Integer);
         break;
       }
 
-      case AssembParser::T__24: {
-        _localctx = dynamic_cast<DerictiveContext *>(_tracker.createInstance<AssembParser::SizeContext>(_localctx));
+      case AssembParser::T__22: {
+        _localctx = dynamic_cast<DirectiveContext *>(_tracker.createInstance<AssembParser::SizeContext>(_localctx));
         enterOuterAlt(_localctx, 4);
-        setState(120);
-        match(AssembParser::T__24);
-        setState(121);
+        setState(139);
+        match(AssembParser::T__22);
+        setState(140);
         match(AssembParser::Integer);
         break;
       }
 
-      case AssembParser::T__25: {
-        _localctx = dynamic_cast<DerictiveContext *>(_tracker.createInstance<AssembParser::AscizContext>(_localctx));
+      case AssembParser::T__23:
+      case AssembParser::T__24: {
+        _localctx = dynamic_cast<DirectiveContext *>(_tracker.createInstance<AssembParser::AscizContext>(_localctx));
         enterOuterAlt(_localctx, 5);
-        setState(122);
-        match(AssembParser::T__25);
-        setState(123);
+        setState(141);
+        _la = _input->LA(1);
+        if (!(_la == AssembParser::T__23
+
+        || _la == AssembParser::T__24)) {
+        _errHandler->recoverInline(this);
+        }
+        else {
+          _errHandler->reportMatch(this);
+          consume();
+        }
+        setState(142);
         match(AssembParser::StringLiteral);
         break;
       }
 
       case AssembParser::IgnoreDirective: {
-        _localctx = dynamic_cast<DerictiveContext *>(_tracker.createInstance<AssembParser::IgnoreContext>(_localctx));
+        _localctx = dynamic_cast<DirectiveContext *>(_tracker.createInstance<AssembParser::IgnoreContext>(_localctx));
         enterOuterAlt(_localctx, 6);
-        setState(124);
+        setState(143);
         match(AssembParser::IgnoreDirective);
         break;
       }
 
     default:
       throw NoViableAltException(this);
+    }
+   
+  }
+  catch (RecognitionException &e) {
+    _errHandler->reportError(this, e);
+    _localctx->exception = std::current_exception();
+    _errHandler->recover(this, _localctx->exception);
+  }
+
+  return _localctx;
+}
+
+//----------------- ImmContext ------------------------------------------------------------------
+
+AssembParser::ImmContext::ImmContext(ParserRuleContext *parent, size_t invokingState)
+  : ParserRuleContext(parent, invokingState) {
+}
+
+tree::TerminalNode* AssembParser::ImmContext::Integer() {
+  return getToken(AssembParser::Integer, 0);
+}
+
+tree::TerminalNode* AssembParser::ImmContext::Relocation() {
+  return getToken(AssembParser::Relocation, 0);
+}
+
+
+size_t AssembParser::ImmContext::getRuleIndex() const {
+  return AssembParser::RuleImm;
+}
+
+void AssembParser::ImmContext::enterRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<AssembListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->enterImm(this);
+}
+
+void AssembParser::ImmContext::exitRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<AssembListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->exitImm(this);
+}
+
+
+antlrcpp::Any AssembParser::ImmContext::accept(tree::ParseTreeVisitor *visitor) {
+  if (auto parserVisitor = dynamic_cast<AssembVisitor*>(visitor))
+    return parserVisitor->visitImm(this);
+  else
+    return visitor->visitChildren(this);
+}
+
+AssembParser::ImmContext* AssembParser::imm() {
+  ImmContext *_localctx = _tracker.createInstance<ImmContext>(_ctx, getState());
+  enterRule(_localctx, 26, AssembParser::RuleImm);
+  size_t _la = 0;
+
+  auto onExit = finally([=] {
+    exitRule();
+  });
+  try {
+    enterOuterAlt(_localctx, 1);
+    setState(146);
+    _la = _input->LA(1);
+    if (!(_la == AssembParser::Relocation
+
+    || _la == AssembParser::Integer)) {
+    _errHandler->recoverInline(this);
+    }
+    else {
+      _errHandler->reportMatch(this);
+      consume();
     }
    
   }
@@ -1548,22 +1753,22 @@ atn::ATN AssembParser::_atn;
 std::vector<uint16_t> AssembParser::_serializedATN;
 
 std::vector<std::string> AssembParser::_ruleNames = {
-  "file", "line", "inst", "rtype", "itype", "stype", "btype", "utype", "jtype", 
-  "pseudoInst", "derictive"
+  "file", "line", "inst", "start", "rtype", "itype", "stype", "btype", "utype", 
+  "jtype", "ltype", "pseudoInst", "directive", "imm"
 };
 
 std::vector<std::string> AssembParser::_literalNames = {
-  "", "','", "'('", "')'", "'mv'", "'li'", "'ret'", "'j'", "'lb'", "'lh'", 
-  "'lw'", "'la'", "'call'", "'seqz'", "'snez'", "'sgtz'", "'sltz'", "'beqz'", 
-  "'bnez'", "'bgtz'", "'bltz'", "'blez'", "'.type'", "'.p2align'", "'.align'", 
-  "'.size'", "'.asciz'", "", "", "", "", "", "", "", "", "'jal'"
+  "", "':'", "','", "'('", "')'", "'mv'", "'li'", "'ret'", "'j'", "'la'", 
+  "'call'", "'seqz'", "'snez'", "'sgtz'", "'sltz'", "'beqz'", "'bnez'", 
+  "'bgtz'", "'bltz'", "'blez'", "'.type'", "'.p2align'", "'.align'", "'.size'", 
+  "'.asciz'", "'.string'", "", "", "", "", "", "", "", "'jal'"
 };
 
 std::vector<std::string> AssembParser::_symbolicNames = {
   "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-  "", "", "", "", "", "", "", "", "", "IgnoreDirective", "Section", "Type", 
-  "Rop", "Iop", "Sop", "Bop", "Uop", "Jop", "Reg", "Symbol", "Label", "StringLiteral", 
-  "Imm", "Relocation", "Integer", "DecimalInteger", "Whitespace", "Newline", 
+  "", "", "", "", "", "", "", "", "Section", "Type", "Rop", "Iop", "Sop", 
+  "Bop", "Uop", "Jop", "Lop", "Reg", "Symbol", "StringLiteral", "Relocation", 
+  "Integer", "DecimalInteger", "IgnoreDirective", "Whitespace", "Newline", 
   "LineComment"
 };
 
@@ -1587,92 +1792,104 @@ AssembParser::Initializer::Initializer() {
 
   _serializedATN = {
     0x3, 0x608b, 0xa72a, 0x8133, 0xb9ed, 0x417c, 0x3be7, 0x7786, 0x5964, 
-    0x3, 0x30, 0x82, 0x4, 0x2, 0x9, 0x2, 0x4, 0x3, 0x9, 0x3, 0x4, 0x4, 0x9, 
+    0x3, 0x2e, 0x97, 0x4, 0x2, 0x9, 0x2, 0x4, 0x3, 0x9, 0x3, 0x4, 0x4, 0x9, 
     0x4, 0x4, 0x5, 0x9, 0x5, 0x4, 0x6, 0x9, 0x6, 0x4, 0x7, 0x9, 0x7, 0x4, 
     0x8, 0x9, 0x8, 0x4, 0x9, 0x9, 0x9, 0x4, 0xa, 0x9, 0xa, 0x4, 0xb, 0x9, 
-    0xb, 0x4, 0xc, 0x9, 0xc, 0x3, 0x2, 0x7, 0x2, 0x1a, 0xa, 0x2, 0xc, 0x2, 
-    0xe, 0x2, 0x1d, 0xb, 0x2, 0x3, 0x2, 0x3, 0x2, 0x3, 0x3, 0x3, 0x3, 0x3, 
-    0x3, 0x5, 0x3, 0x24, 0xa, 0x3, 0x3, 0x4, 0x3, 0x4, 0x3, 0x4, 0x3, 0x4, 
-    0x3, 0x4, 0x3, 0x4, 0x5, 0x4, 0x2c, 0xa, 0x4, 0x3, 0x5, 0x3, 0x5, 0x3, 
-    0x5, 0x3, 0x5, 0x3, 0x5, 0x3, 0x5, 0x3, 0x5, 0x3, 0x6, 0x3, 0x6, 0x3, 
-    0x6, 0x3, 0x6, 0x3, 0x6, 0x3, 0x6, 0x3, 0x6, 0x3, 0x7, 0x3, 0x7, 0x3, 
-    0x7, 0x3, 0x7, 0x3, 0x7, 0x3, 0x7, 0x3, 0x7, 0x3, 0x7, 0x3, 0x8, 0x3, 
-    0x8, 0x3, 0x8, 0x3, 0x8, 0x3, 0x8, 0x3, 0x8, 0x3, 0x8, 0x3, 0x9, 0x3, 
-    0x9, 0x3, 0x9, 0x3, 0x9, 0x3, 0x9, 0x3, 0xa, 0x3, 0xa, 0x3, 0xa, 0x3, 
-    0xa, 0x3, 0xa, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 
-    0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 
-    0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 
-    0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 
-    0xb, 0x3, 0xb, 0x3, 0xb, 0x5, 0xb, 0x72, 0xa, 0xb, 0x3, 0xc, 0x3, 0xc, 
-    0x3, 0xc, 0x3, 0xc, 0x3, 0xc, 0x3, 0xc, 0x3, 0xc, 0x3, 0xc, 0x3, 0xc, 
-    0x3, 0xc, 0x3, 0xc, 0x3, 0xc, 0x5, 0xc, 0x80, 0xa, 0xc, 0x3, 0xc, 0x2, 
-    0x2, 0xd, 0x2, 0x4, 0x6, 0x8, 0xa, 0xc, 0xe, 0x10, 0x12, 0x14, 0x16, 
-    0x2, 0x6, 0x3, 0x2, 0xa, 0xc, 0x3, 0x2, 0xf, 0x12, 0x3, 0x2, 0x13, 0x17, 
-    0x3, 0x2, 0x19, 0x1a, 0x2, 0x8b, 0x2, 0x1b, 0x3, 0x2, 0x2, 0x2, 0x4, 
-    0x23, 0x3, 0x2, 0x2, 0x2, 0x6, 0x2b, 0x3, 0x2, 0x2, 0x2, 0x8, 0x2d, 
-    0x3, 0x2, 0x2, 0x2, 0xa, 0x34, 0x3, 0x2, 0x2, 0x2, 0xc, 0x3b, 0x3, 0x2, 
-    0x2, 0x2, 0xe, 0x43, 0x3, 0x2, 0x2, 0x2, 0x10, 0x4a, 0x3, 0x2, 0x2, 
-    0x2, 0x12, 0x4f, 0x3, 0x2, 0x2, 0x2, 0x14, 0x71, 0x3, 0x2, 0x2, 0x2, 
-    0x16, 0x7f, 0x3, 0x2, 0x2, 0x2, 0x18, 0x1a, 0x5, 0x4, 0x3, 0x2, 0x19, 
-    0x18, 0x3, 0x2, 0x2, 0x2, 0x1a, 0x1d, 0x3, 0x2, 0x2, 0x2, 0x1b, 0x19, 
-    0x3, 0x2, 0x2, 0x2, 0x1b, 0x1c, 0x3, 0x2, 0x2, 0x2, 0x1c, 0x1e, 0x3, 
-    0x2, 0x2, 0x2, 0x1d, 0x1b, 0x3, 0x2, 0x2, 0x2, 0x1e, 0x1f, 0x7, 0x2, 
-    0x2, 0x3, 0x1f, 0x3, 0x3, 0x2, 0x2, 0x2, 0x20, 0x24, 0x5, 0x6, 0x4, 
-    0x2, 0x21, 0x24, 0x5, 0x14, 0xb, 0x2, 0x22, 0x24, 0x5, 0x16, 0xc, 0x2, 
-    0x23, 0x20, 0x3, 0x2, 0x2, 0x2, 0x23, 0x21, 0x3, 0x2, 0x2, 0x2, 0x23, 
-    0x22, 0x3, 0x2, 0x2, 0x2, 0x24, 0x5, 0x3, 0x2, 0x2, 0x2, 0x25, 0x2c, 
-    0x5, 0x8, 0x5, 0x2, 0x26, 0x2c, 0x5, 0xa, 0x6, 0x2, 0x27, 0x2c, 0x5, 
-    0xc, 0x7, 0x2, 0x28, 0x2c, 0x5, 0xe, 0x8, 0x2, 0x29, 0x2c, 0x5, 0x10, 
-    0x9, 0x2, 0x2a, 0x2c, 0x5, 0x12, 0xa, 0x2, 0x2b, 0x25, 0x3, 0x2, 0x2, 
-    0x2, 0x2b, 0x26, 0x3, 0x2, 0x2, 0x2, 0x2b, 0x27, 0x3, 0x2, 0x2, 0x2, 
-    0x2b, 0x28, 0x3, 0x2, 0x2, 0x2, 0x2b, 0x29, 0x3, 0x2, 0x2, 0x2, 0x2b, 
-    0x2a, 0x3, 0x2, 0x2, 0x2, 0x2c, 0x7, 0x3, 0x2, 0x2, 0x2, 0x2d, 0x2e, 
-    0x7, 0x20, 0x2, 0x2, 0x2e, 0x2f, 0x7, 0x26, 0x2, 0x2, 0x2f, 0x30, 0x7, 
-    0x3, 0x2, 0x2, 0x30, 0x31, 0x7, 0x26, 0x2, 0x2, 0x31, 0x32, 0x7, 0x3, 
-    0x2, 0x2, 0x32, 0x33, 0x7, 0x26, 0x2, 0x2, 0x33, 0x9, 0x3, 0x2, 0x2, 
-    0x2, 0x34, 0x35, 0x7, 0x21, 0x2, 0x2, 0x35, 0x36, 0x7, 0x26, 0x2, 0x2, 
-    0x36, 0x37, 0x7, 0x3, 0x2, 0x2, 0x37, 0x38, 0x7, 0x26, 0x2, 0x2, 0x38, 
-    0x39, 0x7, 0x3, 0x2, 0x2, 0x39, 0x3a, 0x7, 0x2a, 0x2, 0x2, 0x3a, 0xb, 
-    0x3, 0x2, 0x2, 0x2, 0x3b, 0x3c, 0x7, 0x22, 0x2, 0x2, 0x3c, 0x3d, 0x7, 
-    0x26, 0x2, 0x2, 0x3d, 0x3e, 0x7, 0x3, 0x2, 0x2, 0x3e, 0x3f, 0x7, 0x2c, 
-    0x2, 0x2, 0x3f, 0x40, 0x7, 0x4, 0x2, 0x2, 0x40, 0x41, 0x7, 0x26, 0x2, 
-    0x2, 0x41, 0x42, 0x7, 0x5, 0x2, 0x2, 0x42, 0xd, 0x3, 0x2, 0x2, 0x2, 
-    0x43, 0x44, 0x7, 0x23, 0x2, 0x2, 0x44, 0x45, 0x7, 0x26, 0x2, 0x2, 0x45, 
-    0x46, 0x7, 0x3, 0x2, 0x2, 0x46, 0x47, 0x7, 0x26, 0x2, 0x2, 0x47, 0x48, 
-    0x7, 0x3, 0x2, 0x2, 0x48, 0x49, 0x7, 0x28, 0x2, 0x2, 0x49, 0xf, 0x3, 
-    0x2, 0x2, 0x2, 0x4a, 0x4b, 0x7, 0x24, 0x2, 0x2, 0x4b, 0x4c, 0x7, 0x26, 
-    0x2, 0x2, 0x4c, 0x4d, 0x7, 0x3, 0x2, 0x2, 0x4d, 0x4e, 0x7, 0x2a, 0x2, 
-    0x2, 0x4e, 0x11, 0x3, 0x2, 0x2, 0x2, 0x4f, 0x50, 0x7, 0x25, 0x2, 0x2, 
-    0x50, 0x51, 0x7, 0x26, 0x2, 0x2, 0x51, 0x52, 0x7, 0x3, 0x2, 0x2, 0x52, 
-    0x53, 0x7, 0x2a, 0x2, 0x2, 0x53, 0x13, 0x3, 0x2, 0x2, 0x2, 0x54, 0x55, 
-    0x7, 0x6, 0x2, 0x2, 0x55, 0x56, 0x7, 0x26, 0x2, 0x2, 0x56, 0x57, 0x7, 
-    0x3, 0x2, 0x2, 0x57, 0x72, 0x7, 0x26, 0x2, 0x2, 0x58, 0x59, 0x7, 0x7, 
-    0x2, 0x2, 0x59, 0x5a, 0x7, 0x26, 0x2, 0x2, 0x5a, 0x5b, 0x7, 0x3, 0x2, 
-    0x2, 0x5b, 0x72, 0x7, 0x2a, 0x2, 0x2, 0x5c, 0x72, 0x7, 0x8, 0x2, 0x2, 
-    0x5d, 0x5e, 0x7, 0x9, 0x2, 0x2, 0x5e, 0x72, 0x7, 0x28, 0x2, 0x2, 0x5f, 
-    0x60, 0x9, 0x2, 0x2, 0x2, 0x60, 0x61, 0x7, 0x26, 0x2, 0x2, 0x61, 0x62, 
-    0x7, 0x3, 0x2, 0x2, 0x62, 0x72, 0x7, 0x27, 0x2, 0x2, 0x63, 0x64, 0x7, 
-    0xd, 0x2, 0x2, 0x64, 0x65, 0x7, 0x26, 0x2, 0x2, 0x65, 0x66, 0x7, 0x3, 
-    0x2, 0x2, 0x66, 0x72, 0x7, 0x27, 0x2, 0x2, 0x67, 0x68, 0x7, 0xe, 0x2, 
-    0x2, 0x68, 0x72, 0x7, 0x27, 0x2, 0x2, 0x69, 0x6a, 0x9, 0x3, 0x2, 0x2, 
-    0x6a, 0x6b, 0x7, 0x26, 0x2, 0x2, 0x6b, 0x6c, 0x7, 0x3, 0x2, 0x2, 0x6c, 
-    0x72, 0x7, 0x26, 0x2, 0x2, 0x6d, 0x6e, 0x9, 0x4, 0x2, 0x2, 0x6e, 0x6f, 
-    0x7, 0x26, 0x2, 0x2, 0x6f, 0x70, 0x7, 0x3, 0x2, 0x2, 0x70, 0x72, 0x7, 
-    0x28, 0x2, 0x2, 0x71, 0x54, 0x3, 0x2, 0x2, 0x2, 0x71, 0x58, 0x3, 0x2, 
-    0x2, 0x2, 0x71, 0x5c, 0x3, 0x2, 0x2, 0x2, 0x71, 0x5d, 0x3, 0x2, 0x2, 
-    0x2, 0x71, 0x5f, 0x3, 0x2, 0x2, 0x2, 0x71, 0x63, 0x3, 0x2, 0x2, 0x2, 
-    0x71, 0x67, 0x3, 0x2, 0x2, 0x2, 0x71, 0x69, 0x3, 0x2, 0x2, 0x2, 0x71, 
-    0x6d, 0x3, 0x2, 0x2, 0x2, 0x72, 0x15, 0x3, 0x2, 0x2, 0x2, 0x73, 0x80, 
-    0x7, 0x1e, 0x2, 0x2, 0x74, 0x75, 0x7, 0x18, 0x2, 0x2, 0x75, 0x76, 0x7, 
-    0x27, 0x2, 0x2, 0x76, 0x77, 0x7, 0x3, 0x2, 0x2, 0x77, 0x80, 0x7, 0x1f, 
-    0x2, 0x2, 0x78, 0x79, 0x9, 0x5, 0x2, 0x2, 0x79, 0x80, 0x7, 0x2c, 0x2, 
-    0x2, 0x7a, 0x7b, 0x7, 0x1b, 0x2, 0x2, 0x7b, 0x80, 0x7, 0x2c, 0x2, 0x2, 
-    0x7c, 0x7d, 0x7, 0x1c, 0x2, 0x2, 0x7d, 0x80, 0x7, 0x29, 0x2, 0x2, 0x7e, 
-    0x80, 0x7, 0x1d, 0x2, 0x2, 0x7f, 0x73, 0x3, 0x2, 0x2, 0x2, 0x7f, 0x74, 
-    0x3, 0x2, 0x2, 0x2, 0x7f, 0x78, 0x3, 0x2, 0x2, 0x2, 0x7f, 0x7a, 0x3, 
-    0x2, 0x2, 0x2, 0x7f, 0x7c, 0x3, 0x2, 0x2, 0x2, 0x7f, 0x7e, 0x3, 0x2, 
-    0x2, 0x2, 0x80, 0x17, 0x3, 0x2, 0x2, 0x2, 0x7, 0x1b, 0x23, 0x2b, 0x71, 
-    0x7f, 
+    0xb, 0x4, 0xc, 0x9, 0xc, 0x4, 0xd, 0x9, 0xd, 0x4, 0xe, 0x9, 0xe, 0x4, 
+    0xf, 0x9, 0xf, 0x3, 0x2, 0x7, 0x2, 0x20, 0xa, 0x2, 0xc, 0x2, 0xe, 0x2, 
+    0x23, 0xb, 0x2, 0x3, 0x2, 0x3, 0x2, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 0x3, 
+    0x3, 0x5, 0x3, 0x2b, 0xa, 0x3, 0x3, 0x4, 0x3, 0x4, 0x3, 0x4, 0x3, 0x4, 
+    0x3, 0x4, 0x3, 0x4, 0x3, 0x4, 0x5, 0x4, 0x34, 0xa, 0x4, 0x3, 0x5, 0x3, 
+    0x5, 0x3, 0x5, 0x3, 0x6, 0x3, 0x6, 0x3, 0x6, 0x3, 0x6, 0x3, 0x6, 0x3, 
+    0x6, 0x3, 0x6, 0x3, 0x7, 0x3, 0x7, 0x3, 0x7, 0x3, 0x7, 0x3, 0x7, 0x3, 
+    0x7, 0x3, 0x7, 0x3, 0x8, 0x3, 0x8, 0x3, 0x8, 0x3, 0x8, 0x3, 0x8, 0x3, 
+    0x8, 0x3, 0x8, 0x3, 0x8, 0x3, 0x9, 0x3, 0x9, 0x3, 0x9, 0x3, 0x9, 0x3, 
+    0x9, 0x3, 0x9, 0x3, 0x9, 0x3, 0xa, 0x3, 0xa, 0x3, 0xa, 0x3, 0xa, 0x3, 
+    0xa, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xb, 0x3, 0xc, 0x3, 
+    0xc, 0x3, 0xc, 0x3, 0xc, 0x3, 0xc, 0x3, 0xc, 0x3, 0xc, 0x3, 0xc, 0x3, 
+    0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 
+    0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 
+    0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 
+    0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 0xd, 0x3, 
+    0xd, 0x5, 0xd, 0x85, 0xa, 0xd, 0x3, 0xe, 0x3, 0xe, 0x3, 0xe, 0x3, 0xe, 
+    0x3, 0xe, 0x3, 0xe, 0x3, 0xe, 0x3, 0xe, 0x3, 0xe, 0x3, 0xe, 0x3, 0xe, 
+    0x3, 0xe, 0x5, 0xe, 0x93, 0xa, 0xe, 0x3, 0xf, 0x3, 0xf, 0x3, 0xf, 0x2, 
+    0x2, 0x10, 0x2, 0x4, 0x6, 0x8, 0xa, 0xc, 0xe, 0x10, 0x12, 0x14, 0x16, 
+    0x18, 0x1a, 0x1c, 0x2, 0x7, 0x3, 0x2, 0xd, 0x10, 0x3, 0x2, 0x11, 0x15, 
+    0x3, 0x2, 0x17, 0x18, 0x3, 0x2, 0x1a, 0x1b, 0x3, 0x2, 0x28, 0x29, 0x2, 
+    0x9f, 0x2, 0x21, 0x3, 0x2, 0x2, 0x2, 0x4, 0x2a, 0x3, 0x2, 0x2, 0x2, 
+    0x6, 0x33, 0x3, 0x2, 0x2, 0x2, 0x8, 0x35, 0x3, 0x2, 0x2, 0x2, 0xa, 0x38, 
+    0x3, 0x2, 0x2, 0x2, 0xc, 0x3f, 0x3, 0x2, 0x2, 0x2, 0xe, 0x46, 0x3, 0x2, 
+    0x2, 0x2, 0x10, 0x4e, 0x3, 0x2, 0x2, 0x2, 0x12, 0x55, 0x3, 0x2, 0x2, 
+    0x2, 0x14, 0x5a, 0x3, 0x2, 0x2, 0x2, 0x16, 0x5f, 0x3, 0x2, 0x2, 0x2, 
+    0x18, 0x84, 0x3, 0x2, 0x2, 0x2, 0x1a, 0x92, 0x3, 0x2, 0x2, 0x2, 0x1c, 
+    0x94, 0x3, 0x2, 0x2, 0x2, 0x1e, 0x20, 0x5, 0x4, 0x3, 0x2, 0x1f, 0x1e, 
+    0x3, 0x2, 0x2, 0x2, 0x20, 0x23, 0x3, 0x2, 0x2, 0x2, 0x21, 0x1f, 0x3, 
+    0x2, 0x2, 0x2, 0x21, 0x22, 0x3, 0x2, 0x2, 0x2, 0x22, 0x24, 0x3, 0x2, 
+    0x2, 0x2, 0x23, 0x21, 0x3, 0x2, 0x2, 0x2, 0x24, 0x25, 0x7, 0x2, 0x2, 
+    0x3, 0x25, 0x3, 0x3, 0x2, 0x2, 0x2, 0x26, 0x2b, 0x5, 0x6, 0x4, 0x2, 
+    0x27, 0x2b, 0x5, 0x18, 0xd, 0x2, 0x28, 0x2b, 0x5, 0x1a, 0xe, 0x2, 0x29, 
+    0x2b, 0x5, 0x8, 0x5, 0x2, 0x2a, 0x26, 0x3, 0x2, 0x2, 0x2, 0x2a, 0x27, 
+    0x3, 0x2, 0x2, 0x2, 0x2a, 0x28, 0x3, 0x2, 0x2, 0x2, 0x2a, 0x29, 0x3, 
+    0x2, 0x2, 0x2, 0x2b, 0x5, 0x3, 0x2, 0x2, 0x2, 0x2c, 0x34, 0x5, 0xa, 
+    0x6, 0x2, 0x2d, 0x34, 0x5, 0xc, 0x7, 0x2, 0x2e, 0x34, 0x5, 0xe, 0x8, 
+    0x2, 0x2f, 0x34, 0x5, 0x10, 0x9, 0x2, 0x30, 0x34, 0x5, 0x12, 0xa, 0x2, 
+    0x31, 0x34, 0x5, 0x14, 0xb, 0x2, 0x32, 0x34, 0x5, 0x16, 0xc, 0x2, 0x33, 
+    0x2c, 0x3, 0x2, 0x2, 0x2, 0x33, 0x2d, 0x3, 0x2, 0x2, 0x2, 0x33, 0x2e, 
+    0x3, 0x2, 0x2, 0x2, 0x33, 0x2f, 0x3, 0x2, 0x2, 0x2, 0x33, 0x30, 0x3, 
+    0x2, 0x2, 0x2, 0x33, 0x31, 0x3, 0x2, 0x2, 0x2, 0x33, 0x32, 0x3, 0x2, 
+    0x2, 0x2, 0x34, 0x7, 0x3, 0x2, 0x2, 0x2, 0x35, 0x36, 0x7, 0x26, 0x2, 
+    0x2, 0x36, 0x37, 0x7, 0x3, 0x2, 0x2, 0x37, 0x9, 0x3, 0x2, 0x2, 0x2, 
+    0x38, 0x39, 0x7, 0x1e, 0x2, 0x2, 0x39, 0x3a, 0x7, 0x25, 0x2, 0x2, 0x3a, 
+    0x3b, 0x7, 0x4, 0x2, 0x2, 0x3b, 0x3c, 0x7, 0x25, 0x2, 0x2, 0x3c, 0x3d, 
+    0x7, 0x4, 0x2, 0x2, 0x3d, 0x3e, 0x7, 0x25, 0x2, 0x2, 0x3e, 0xb, 0x3, 
+    0x2, 0x2, 0x2, 0x3f, 0x40, 0x7, 0x1f, 0x2, 0x2, 0x40, 0x41, 0x7, 0x25, 
+    0x2, 0x2, 0x41, 0x42, 0x7, 0x4, 0x2, 0x2, 0x42, 0x43, 0x7, 0x25, 0x2, 
+    0x2, 0x43, 0x44, 0x7, 0x4, 0x2, 0x2, 0x44, 0x45, 0x5, 0x1c, 0xf, 0x2, 
+    0x45, 0xd, 0x3, 0x2, 0x2, 0x2, 0x46, 0x47, 0x7, 0x20, 0x2, 0x2, 0x47, 
+    0x48, 0x7, 0x25, 0x2, 0x2, 0x48, 0x49, 0x7, 0x4, 0x2, 0x2, 0x49, 0x4a, 
+    0x5, 0x1c, 0xf, 0x2, 0x4a, 0x4b, 0x7, 0x5, 0x2, 0x2, 0x4b, 0x4c, 0x7, 
+    0x25, 0x2, 0x2, 0x4c, 0x4d, 0x7, 0x6, 0x2, 0x2, 0x4d, 0xf, 0x3, 0x2, 
+    0x2, 0x2, 0x4e, 0x4f, 0x7, 0x21, 0x2, 0x2, 0x4f, 0x50, 0x7, 0x25, 0x2, 
+    0x2, 0x50, 0x51, 0x7, 0x4, 0x2, 0x2, 0x51, 0x52, 0x7, 0x25, 0x2, 0x2, 
+    0x52, 0x53, 0x7, 0x4, 0x2, 0x2, 0x53, 0x54, 0x7, 0x26, 0x2, 0x2, 0x54, 
+    0x11, 0x3, 0x2, 0x2, 0x2, 0x55, 0x56, 0x7, 0x22, 0x2, 0x2, 0x56, 0x57, 
+    0x7, 0x25, 0x2, 0x2, 0x57, 0x58, 0x7, 0x4, 0x2, 0x2, 0x58, 0x59, 0x5, 
+    0x1c, 0xf, 0x2, 0x59, 0x13, 0x3, 0x2, 0x2, 0x2, 0x5a, 0x5b, 0x7, 0x23, 
+    0x2, 0x2, 0x5b, 0x5c, 0x7, 0x25, 0x2, 0x2, 0x5c, 0x5d, 0x7, 0x4, 0x2, 
+    0x2, 0x5d, 0x5e, 0x5, 0x1c, 0xf, 0x2, 0x5e, 0x15, 0x3, 0x2, 0x2, 0x2, 
+    0x5f, 0x60, 0x7, 0x24, 0x2, 0x2, 0x60, 0x61, 0x7, 0x25, 0x2, 0x2, 0x61, 
+    0x62, 0x7, 0x4, 0x2, 0x2, 0x62, 0x63, 0x5, 0x1c, 0xf, 0x2, 0x63, 0x64, 
+    0x7, 0x5, 0x2, 0x2, 0x64, 0x65, 0x7, 0x25, 0x2, 0x2, 0x65, 0x66, 0x7, 
+    0x6, 0x2, 0x2, 0x66, 0x17, 0x3, 0x2, 0x2, 0x2, 0x67, 0x68, 0x7, 0x7, 
+    0x2, 0x2, 0x68, 0x69, 0x7, 0x25, 0x2, 0x2, 0x69, 0x6a, 0x7, 0x4, 0x2, 
+    0x2, 0x6a, 0x85, 0x7, 0x25, 0x2, 0x2, 0x6b, 0x6c, 0x7, 0x8, 0x2, 0x2, 
+    0x6c, 0x6d, 0x7, 0x25, 0x2, 0x2, 0x6d, 0x6e, 0x7, 0x4, 0x2, 0x2, 0x6e, 
+    0x85, 0x5, 0x1c, 0xf, 0x2, 0x6f, 0x85, 0x7, 0x9, 0x2, 0x2, 0x70, 0x71, 
+    0x7, 0xa, 0x2, 0x2, 0x71, 0x85, 0x7, 0x26, 0x2, 0x2, 0x72, 0x73, 0x7, 
+    0x24, 0x2, 0x2, 0x73, 0x74, 0x7, 0x25, 0x2, 0x2, 0x74, 0x75, 0x7, 0x4, 
+    0x2, 0x2, 0x75, 0x85, 0x7, 0x26, 0x2, 0x2, 0x76, 0x77, 0x7, 0xb, 0x2, 
+    0x2, 0x77, 0x78, 0x7, 0x25, 0x2, 0x2, 0x78, 0x79, 0x7, 0x4, 0x2, 0x2, 
+    0x79, 0x85, 0x7, 0x26, 0x2, 0x2, 0x7a, 0x7b, 0x7, 0xc, 0x2, 0x2, 0x7b, 
+    0x85, 0x7, 0x26, 0x2, 0x2, 0x7c, 0x7d, 0x9, 0x2, 0x2, 0x2, 0x7d, 0x7e, 
+    0x7, 0x25, 0x2, 0x2, 0x7e, 0x7f, 0x7, 0x4, 0x2, 0x2, 0x7f, 0x85, 0x7, 
+    0x25, 0x2, 0x2, 0x80, 0x81, 0x9, 0x3, 0x2, 0x2, 0x81, 0x82, 0x7, 0x25, 
+    0x2, 0x2, 0x82, 0x83, 0x7, 0x4, 0x2, 0x2, 0x83, 0x85, 0x7, 0x26, 0x2, 
+    0x2, 0x84, 0x67, 0x3, 0x2, 0x2, 0x2, 0x84, 0x6b, 0x3, 0x2, 0x2, 0x2, 
+    0x84, 0x6f, 0x3, 0x2, 0x2, 0x2, 0x84, 0x70, 0x3, 0x2, 0x2, 0x2, 0x84, 
+    0x72, 0x3, 0x2, 0x2, 0x2, 0x84, 0x76, 0x3, 0x2, 0x2, 0x2, 0x84, 0x7a, 
+    0x3, 0x2, 0x2, 0x2, 0x84, 0x7c, 0x3, 0x2, 0x2, 0x2, 0x84, 0x80, 0x3, 
+    0x2, 0x2, 0x2, 0x85, 0x19, 0x3, 0x2, 0x2, 0x2, 0x86, 0x93, 0x7, 0x1c, 
+    0x2, 0x2, 0x87, 0x88, 0x7, 0x16, 0x2, 0x2, 0x88, 0x89, 0x7, 0x26, 0x2, 
+    0x2, 0x89, 0x8a, 0x7, 0x4, 0x2, 0x2, 0x8a, 0x93, 0x7, 0x1d, 0x2, 0x2, 
+    0x8b, 0x8c, 0x9, 0x4, 0x2, 0x2, 0x8c, 0x93, 0x7, 0x29, 0x2, 0x2, 0x8d, 
+    0x8e, 0x7, 0x19, 0x2, 0x2, 0x8e, 0x93, 0x7, 0x29, 0x2, 0x2, 0x8f, 0x90, 
+    0x9, 0x5, 0x2, 0x2, 0x90, 0x93, 0x7, 0x27, 0x2, 0x2, 0x91, 0x93, 0x7, 
+    0x2b, 0x2, 0x2, 0x92, 0x86, 0x3, 0x2, 0x2, 0x2, 0x92, 0x87, 0x3, 0x2, 
+    0x2, 0x2, 0x92, 0x8b, 0x3, 0x2, 0x2, 0x2, 0x92, 0x8d, 0x3, 0x2, 0x2, 
+    0x2, 0x92, 0x8f, 0x3, 0x2, 0x2, 0x2, 0x92, 0x91, 0x3, 0x2, 0x2, 0x2, 
+    0x93, 0x1b, 0x3, 0x2, 0x2, 0x2, 0x94, 0x95, 0x9, 0x6, 0x2, 0x2, 0x95, 
+    0x1d, 0x3, 0x2, 0x2, 0x2, 0x7, 0x21, 0x2a, 0x33, 0x84, 0x92, 
   };
 
   atn::ATNDeserializer deserializer;

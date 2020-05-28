@@ -15,17 +15,17 @@ public:
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
     T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
-    T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, T__25 = 26, 
-    IgnoreDirective = 27, Section = 28, Type = 29, Rop = 30, Iop = 31, Sop = 32, 
-    Bop = 33, Uop = 34, Jop = 35, Reg = 36, Symbol = 37, Label = 38, StringLiteral = 39, 
-    Imm = 40, Relocation = 41, Integer = 42, DecimalInteger = 43, Whitespace = 44, 
-    Newline = 45, LineComment = 46
+    T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, Section = 26, 
+    Type = 27, Rop = 28, Iop = 29, Sop = 30, Bop = 31, Uop = 32, Jop = 33, 
+    Lop = 34, Reg = 35, Symbol = 36, StringLiteral = 37, Relocation = 38, 
+    Integer = 39, DecimalInteger = 40, IgnoreDirective = 41, Whitespace = 42, 
+    Newline = 43, LineComment = 44
   };
 
   enum {
-    RuleFile = 0, RuleLine = 1, RuleInst = 2, RuleRtype = 3, RuleItype = 4, 
-    RuleStype = 5, RuleBtype = 6, RuleUtype = 7, RuleJtype = 8, RulePseudoInst = 9, 
-    RuleDerictive = 10
+    RuleFile = 0, RuleLine = 1, RuleInst = 2, RuleStart = 3, RuleRtype = 4, 
+    RuleItype = 5, RuleStype = 6, RuleBtype = 7, RuleUtype = 8, RuleJtype = 9, 
+    RuleLtype = 10, RulePseudoInst = 11, RuleDirective = 12, RuleImm = 13
   };
 
   AssembParser(antlr4::TokenStream *input);
@@ -41,14 +41,17 @@ public:
   class FileContext;
   class LineContext;
   class InstContext;
+  class StartContext;
   class RtypeContext;
   class ItypeContext;
   class StypeContext;
   class BtypeContext;
   class UtypeContext;
   class JtypeContext;
+  class LtypeContext;
   class PseudoInstContext;
-  class DerictiveContext; 
+  class DirectiveContext;
+  class ImmContext; 
 
   class  FileContext : public antlr4::ParserRuleContext {
   public:
@@ -73,7 +76,8 @@ public:
     virtual size_t getRuleIndex() const override;
     InstContext *inst();
     PseudoInstContext *pseudoInst();
-    DerictiveContext *derictive();
+    DirectiveContext *directive();
+    StartContext *start();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -94,6 +98,7 @@ public:
     BtypeContext *btype();
     UtypeContext *utype();
     JtypeContext *jtype();
+    LtypeContext *ltype();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -103,6 +108,21 @@ public:
   };
 
   InstContext* inst();
+
+  class  StartContext : public antlr4::ParserRuleContext {
+  public:
+    StartContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *Symbol();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  StartContext* start();
 
   class  RtypeContext : public antlr4::ParserRuleContext {
   public:
@@ -128,13 +148,13 @@ public:
   public:
     antlr4::Token *rd = nullptr;;
     antlr4::Token *src = nullptr;;
-    antlr4::Token *imm = nullptr;;
+    AssembParser::ImmContext *im = nullptr;;
     ItypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Iop();
     std::vector<antlr4::tree::TerminalNode *> Reg();
     antlr4::tree::TerminalNode* Reg(size_t i);
-    antlr4::tree::TerminalNode *Imm();
+    ImmContext *imm();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -148,14 +168,14 @@ public:
   class  StypeContext : public antlr4::ParserRuleContext {
   public:
     antlr4::Token *value = nullptr;;
-    antlr4::Token *offset = nullptr;;
+    AssembParser::ImmContext *offset = nullptr;;
     antlr4::Token *addr = nullptr;;
     StypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Sop();
     std::vector<antlr4::tree::TerminalNode *> Reg();
     antlr4::tree::TerminalNode* Reg(size_t i);
-    antlr4::tree::TerminalNode *Integer();
+    ImmContext *imm();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -176,7 +196,7 @@ public:
     antlr4::tree::TerminalNode *Bop();
     std::vector<antlr4::tree::TerminalNode *> Reg();
     antlr4::tree::TerminalNode* Reg(size_t i);
-    antlr4::tree::TerminalNode *Label();
+    antlr4::tree::TerminalNode *Symbol();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -190,12 +210,12 @@ public:
   class  UtypeContext : public antlr4::ParserRuleContext {
   public:
     antlr4::Token *rd = nullptr;;
-    antlr4::Token *imm = nullptr;;
+    AssembParser::ImmContext *im = nullptr;;
     UtypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Uop();
     antlr4::tree::TerminalNode *Reg();
-    antlr4::tree::TerminalNode *Imm();
+    ImmContext *imm();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -209,12 +229,12 @@ public:
   class  JtypeContext : public antlr4::ParserRuleContext {
   public:
     antlr4::Token *rd = nullptr;;
-    antlr4::Token *imm = nullptr;;
+    AssembParser::ImmContext *im = nullptr;;
     JtypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *Jop();
     antlr4::tree::TerminalNode *Reg();
-    antlr4::tree::TerminalNode *Imm();
+    ImmContext *imm();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -224,6 +244,27 @@ public:
   };
 
   JtypeContext* jtype();
+
+  class  LtypeContext : public antlr4::ParserRuleContext {
+  public:
+    antlr4::Token *rd = nullptr;;
+    AssembParser::ImmContext *im = nullptr;;
+    antlr4::Token *rs = nullptr;;
+    LtypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *Lop();
+    std::vector<antlr4::tree::TerminalNode *> Reg();
+    antlr4::tree::TerminalNode* Reg(size_t i);
+    ImmContext *imm();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  LtypeContext* ltype();
 
   class  PseudoInstContext : public antlr4::ParserRuleContext {
   public:
@@ -278,7 +319,7 @@ public:
     JpContext(PseudoInstContext *ctx);
 
     antlr4::Token *label = nullptr;
-    antlr4::tree::TerminalNode *Label();
+    antlr4::tree::TerminalNode *Symbol();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
 
@@ -305,6 +346,7 @@ public:
 
     antlr4::Token *rd = nullptr;
     antlr4::Token *src = nullptr;
+    antlr4::tree::TerminalNode *Lop();
     antlr4::tree::TerminalNode *Reg();
     antlr4::tree::TerminalNode *Symbol();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -320,7 +362,7 @@ public:
     antlr4::Token *src = nullptr;
     antlr4::Token *label = nullptr;
     antlr4::tree::TerminalNode *Reg();
-    antlr4::tree::TerminalNode *Label();
+    antlr4::tree::TerminalNode *Symbol();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
 
@@ -346,9 +388,9 @@ public:
     LiContext(PseudoInstContext *ctx);
 
     antlr4::Token *rd = nullptr;
-    antlr4::Token *src = nullptr;
+    AssembParser::ImmContext *src = nullptr;
     antlr4::tree::TerminalNode *Reg();
-    antlr4::tree::TerminalNode *Imm();
+    ImmContext *imm();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
 
@@ -357,12 +399,12 @@ public:
 
   PseudoInstContext* pseudoInst();
 
-  class  DerictiveContext : public antlr4::ParserRuleContext {
+  class  DirectiveContext : public antlr4::ParserRuleContext {
   public:
-    DerictiveContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    DirectiveContext(antlr4::ParserRuleContext *parent, size_t invokingState);
    
-    DerictiveContext() = default;
-    void copyFrom(DerictiveContext *context);
+    DirectiveContext() = default;
+    void copyFrom(DirectiveContext *context);
     using antlr4::ParserRuleContext::copyFrom;
 
     virtual size_t getRuleIndex() const override;
@@ -370,9 +412,9 @@ public:
    
   };
 
-  class  SizeContext : public DerictiveContext {
+  class  SizeContext : public DirectiveContext {
   public:
-    SizeContext(DerictiveContext *ctx);
+    SizeContext(DirectiveContext *ctx);
 
     antlr4::tree::TerminalNode *Integer();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -381,9 +423,9 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  IgnoreContext : public DerictiveContext {
+  class  IgnoreContext : public DirectiveContext {
   public:
-    IgnoreContext(DerictiveContext *ctx);
+    IgnoreContext(DirectiveContext *ctx);
 
     antlr4::tree::TerminalNode *IgnoreDirective();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -392,9 +434,9 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  SectionContext : public DerictiveContext {
+  class  SectionContext : public DirectiveContext {
   public:
-    SectionContext(DerictiveContext *ctx);
+    SectionContext(DirectiveContext *ctx);
 
     antlr4::tree::TerminalNode *Section();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -403,9 +445,9 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  TypeContext : public DerictiveContext {
+  class  TypeContext : public DirectiveContext {
   public:
-    TypeContext(DerictiveContext *ctx);
+    TypeContext(DirectiveContext *ctx);
 
     antlr4::Token *symbol = nullptr;
     antlr4::tree::TerminalNode *Type();
@@ -416,9 +458,9 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  AlignContext : public DerictiveContext {
+  class  AlignContext : public DirectiveContext {
   public:
-    AlignContext(DerictiveContext *ctx);
+    AlignContext(DirectiveContext *ctx);
 
     antlr4::tree::TerminalNode *Integer();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -427,9 +469,9 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  AscizContext : public DerictiveContext {
+  class  AscizContext : public DirectiveContext {
   public:
-    AscizContext(DerictiveContext *ctx);
+    AscizContext(DirectiveContext *ctx);
 
     antlr4::tree::TerminalNode *StringLiteral();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -438,7 +480,23 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  DerictiveContext* derictive();
+  DirectiveContext* directive();
+
+  class  ImmContext : public antlr4::ParserRuleContext {
+  public:
+    ImmContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *Integer();
+    antlr4::tree::TerminalNode *Relocation();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  ImmContext* imm();
 
 
 private:

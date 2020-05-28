@@ -25,6 +25,9 @@ public:
   virtual void enterInst(AssembParser::InstContext * /*ctx*/) override { }
   virtual void exitInst(AssembParser::InstContext * /*ctx*/) override { }
 
+  virtual void enterStart(AssembParser::StartContext * /*ctx*/) override { }
+  virtual void exitStart(AssembParser::StartContext * /*ctx*/) override { }
+
   virtual void enterRtype(AssembParser::RtypeContext * /*ctx*/) override { }
   virtual void exitRtype(AssembParser::RtypeContext * /*ctx*/) override { }
 
@@ -42,6 +45,9 @@ public:
 
   virtual void enterJtype(AssembParser::JtypeContext * /*ctx*/) override { }
   virtual void exitJtype(AssembParser::JtypeContext * /*ctx*/) override { }
+
+  virtual void enterLtype(AssembParser::LtypeContext * /*ctx*/) override { }
+  virtual void exitLtype(AssembParser::LtypeContext * /*ctx*/) override { }
 
   virtual void enterMv(AssembParser::MvContext * /*ctx*/) override { }
   virtual void exitMv(AssembParser::MvContext * /*ctx*/) override { }
@@ -87,6 +93,9 @@ public:
 
   virtual void enterIgnore(AssembParser::IgnoreContext * /*ctx*/) override { }
   virtual void exitIgnore(AssembParser::IgnoreContext * /*ctx*/) override { }
+
+  virtual void enterImm(AssembParser::ImmContext * /*ctx*/) override { }
+  virtual void exitImm(AssembParser::ImmContext * /*ctx*/) override { }
 
 
   virtual void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }

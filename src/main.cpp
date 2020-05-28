@@ -4,8 +4,8 @@
 #include "AssembLexer.h"
 #include "AssembParser.h"
 #include "AssembBaseVisitor.h"
-#include "defines.h"
-#include "elf.h"
+#include "includes.h"
+#include "Evalvisitor.h"
 
 using namespace antlr4;
 int main() {
@@ -21,8 +21,8 @@ int main() {
     tokens.fill();
     AssembParser parser(&tokens);
     tree::ParseTree* tree=parser.file();
-    // EvalVisitor visitor;
-    // visitor.visit(tree);
+    EvalVisitor visitor;
+    visitor.visit(tree);
 
     ifs.close();
     return 0;
