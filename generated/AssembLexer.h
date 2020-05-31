@@ -14,12 +14,11 @@ public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
-    T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
-    T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, Section = 26, 
-    Type = 27, Rop = 28, Iop = 29, Sop = 30, Bop = 31, Uop = 32, Jop = 33, 
-    Lop = 34, Reg = 35, Symbol = 36, StringLiteral = 37, Relocation = 38, 
-    Integer = 39, DecimalInteger = 40, IgnoreDirective = 41, Whitespace = 42, 
-    Newline = 43, LineComment = 44
+    T__14 = 15, T__15 = 16, Section = 17, Type = 18, Rop = 19, Iop = 20, 
+    Sop = 21, Bop = 22, Uop = 23, Jop = 24, Lop = 25, Szop = 26, Bzop = 27, 
+    Reg = 28, Symbol = 29, StringLiteral = 30, Relocation = 31, Integer = 32, 
+    DecimalInteger = 33, IgnoreDirective = 34, Whitespace = 35, Newline = 36, 
+    LineComment = 37
   };
 
   AssembLexer(antlr4::CharStream *input);

@@ -192,7 +192,7 @@ enum {
 //BIND: LOCAL-0, GLOBAL-1; 
 //TYPE: NOTYPE-0, OBJECT-1, FUNC-2, SECTION-3, FILE-4, COMMON-5
 
-#define ELF32_ST_VISIBILITY(o) ((o)&0x3)
+#define ELF32_ST_VISIBILITY(o) ((o)&0x3)	//only keep the last 2 bits
 //visibility: DEFAULT-0
 typedef struct {
 	Elf32_Word	st_name;

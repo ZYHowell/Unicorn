@@ -192,9 +192,9 @@ typedef struct {
     	//In relocatable files, alignment constraints for a symbol whose section index is SHN_COMMON. 
 	Elf32_Word	st_size;
     	//associated size
-	unsigned char	st_info;
+	Elf32_Byte	st_info;
     	//info about BIND, TYPE
-	unsigned char	st_other;
+	Elf32_Byte	st_other;
     	//info about visibility
 	Elf32_Half	st_shndx;
     	//a symbol table is defined in relation to some section, this is the relevant section header table index. 
