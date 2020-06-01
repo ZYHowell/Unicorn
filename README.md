@@ -3,7 +3,7 @@ MS208 homework in ACM class, another part, an assembler of RISCV. Named after th
 
 However, only test on my own computer(the OS and hardware may make it useless)
 
-The error is not complete either. 
+The error detector is not complete either. 
 
 後方支援は任せて…ユニコーン…頑張る！
 

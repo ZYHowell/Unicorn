@@ -99,6 +99,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitGlobl(AssembParser::GloblContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitType(AssembParser::TypeContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -115,11 +119,19 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitFilename(AssembParser::FilenameContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitIgnore(AssembParser::IgnoreContext *ctx) override {
     return visitChildren(ctx);
   }
 
   virtual antlrcpp::Any visitImm(AssembParser::ImmContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitRelocation(AssembParser::RelocationContext *ctx) override {
     return visitChildren(ctx);
   }
 

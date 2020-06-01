@@ -79,6 +79,9 @@ public:
   virtual void enterSection(AssembParser::SectionContext * /*ctx*/) override { }
   virtual void exitSection(AssembParser::SectionContext * /*ctx*/) override { }
 
+  virtual void enterGlobl(AssembParser::GloblContext * /*ctx*/) override { }
+  virtual void exitGlobl(AssembParser::GloblContext * /*ctx*/) override { }
+
   virtual void enterType(AssembParser::TypeContext * /*ctx*/) override { }
   virtual void exitType(AssembParser::TypeContext * /*ctx*/) override { }
 
@@ -91,11 +94,17 @@ public:
   virtual void enterAsciz(AssembParser::AscizContext * /*ctx*/) override { }
   virtual void exitAsciz(AssembParser::AscizContext * /*ctx*/) override { }
 
+  virtual void enterFilename(AssembParser::FilenameContext * /*ctx*/) override { }
+  virtual void exitFilename(AssembParser::FilenameContext * /*ctx*/) override { }
+
   virtual void enterIgnore(AssembParser::IgnoreContext * /*ctx*/) override { }
   virtual void exitIgnore(AssembParser::IgnoreContext * /*ctx*/) override { }
 
   virtual void enterImm(AssembParser::ImmContext * /*ctx*/) override { }
   virtual void exitImm(AssembParser::ImmContext * /*ctx*/) override { }
+
+  virtual void enterRelocation(AssembParser::RelocationContext * /*ctx*/) override { }
+  virtual void exitRelocation(AssembParser::RelocationContext * /*ctx*/) override { }
 
 
   virtual void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }

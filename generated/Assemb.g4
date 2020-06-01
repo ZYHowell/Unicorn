@@ -28,10 +28,12 @@ pseudoInst
 
 directive
     : Section                               #section
+    | '.globl' symbol=Symbol                #globl
     | '.type' symbol=Symbol ',' Type        #type
     | ('.p2align' | '.align') Integer       #align
     | '.size' Integer                       #size
     | ('.asciz' | '.string') StringLiteral  #asciz
+    | '.file' name=StringLiteral            #filename
     | IgnoreDirective                       #ignore
     ;
 
@@ -65,8 +67,10 @@ SChar
     ;
 
 
-imm: Integer | Relocation;
-Relocation: ('%hi' | '%lo') '(' Symbol ')';
+imm: Integer | relocation;
+relocation: HL '(' Symbol ')';
+HL: ('%hi' | '%lo');
+
 Integer: DecimalInteger | ('-' DecimalInteger);
 DecimalInteger: [1-9] [0-9]* | '0';
 IgnoreDirective: '.' ~[\r\n]+;

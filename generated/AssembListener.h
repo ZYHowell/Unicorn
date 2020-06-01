@@ -77,6 +77,9 @@ public:
   virtual void enterSection(AssembParser::SectionContext *ctx) = 0;
   virtual void exitSection(AssembParser::SectionContext *ctx) = 0;
 
+  virtual void enterGlobl(AssembParser::GloblContext *ctx) = 0;
+  virtual void exitGlobl(AssembParser::GloblContext *ctx) = 0;
+
   virtual void enterType(AssembParser::TypeContext *ctx) = 0;
   virtual void exitType(AssembParser::TypeContext *ctx) = 0;
 
@@ -89,11 +92,17 @@ public:
   virtual void enterAsciz(AssembParser::AscizContext *ctx) = 0;
   virtual void exitAsciz(AssembParser::AscizContext *ctx) = 0;
 
+  virtual void enterFilename(AssembParser::FilenameContext *ctx) = 0;
+  virtual void exitFilename(AssembParser::FilenameContext *ctx) = 0;
+
   virtual void enterIgnore(AssembParser::IgnoreContext *ctx) = 0;
   virtual void exitIgnore(AssembParser::IgnoreContext *ctx) = 0;
 
   virtual void enterImm(AssembParser::ImmContext *ctx) = 0;
   virtual void exitImm(AssembParser::ImmContext *ctx) = 0;
+
+  virtual void enterRelocation(AssembParser::RelocationContext *ctx) = 0;
+  virtual void exitRelocation(AssembParser::RelocationContext *ctx) = 0;
 
 
 };

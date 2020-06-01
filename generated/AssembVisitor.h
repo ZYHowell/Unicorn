@@ -61,6 +61,8 @@ public:
 
     virtual antlrcpp::Any visitSection(AssembParser::SectionContext *context) = 0;
 
+    virtual antlrcpp::Any visitGlobl(AssembParser::GloblContext *context) = 0;
+
     virtual antlrcpp::Any visitType(AssembParser::TypeContext *context) = 0;
 
     virtual antlrcpp::Any visitAlign(AssembParser::AlignContext *context) = 0;
@@ -69,9 +71,13 @@ public:
 
     virtual antlrcpp::Any visitAsciz(AssembParser::AscizContext *context) = 0;
 
+    virtual antlrcpp::Any visitFilename(AssembParser::FilenameContext *context) = 0;
+
     virtual antlrcpp::Any visitIgnore(AssembParser::IgnoreContext *context) = 0;
 
     virtual antlrcpp::Any visitImm(AssembParser::ImmContext *context) = 0;
+
+    virtual antlrcpp::Any visitRelocation(AssembParser::RelocationContext *context) = 0;
 
 
 };
