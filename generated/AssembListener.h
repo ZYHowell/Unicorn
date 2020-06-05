@@ -86,8 +86,8 @@ public:
   virtual void enterAlign(AssembParser::AlignContext *ctx) = 0;
   virtual void exitAlign(AssembParser::AlignContext *ctx) = 0;
 
-  virtual void enterSize(AssembParser::SizeContext *ctx) = 0;
-  virtual void exitSize(AssembParser::SizeContext *ctx) = 0;
+  virtual void enterWord(AssembParser::WordContext *ctx) = 0;
+  virtual void exitWord(AssembParser::WordContext *ctx) = 0;
 
   virtual void enterAsciz(AssembParser::AscizContext *ctx) = 0;
   virtual void exitAsciz(AssembParser::AscizContext *ctx) = 0;

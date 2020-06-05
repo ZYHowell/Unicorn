@@ -10,15 +10,21 @@ private:
     struct section_t{
       Elf32_Shdr header;
       std::vector<std::byte> contents;
-      section_t(): header(), contents(){}
+      Elf32_Off offset = 0;
+      section_t(): header(), contents() {
+        memset(&header, 0, sizeof(Elf32_Shdr));
+        header.sh_addralign = 1;
+      }
     };
     struct symbol_t{
       Elf32_Sym info;
       Elf32_Byte bind = STB_LOCAL;
       Elf32_Byte type = STT_NOTYPE;
-      Elf32_Off offset = 0;
       bool hasOffset = false;
       section_t* section = nullptr;
+      symbol_t(): info() {
+        memset(&info, 0, sizeof(Elf32_Sym));
+      }
     };
 
     using string = std::string;
@@ -30,14 +36,15 @@ private:
     std::map<string, section_t*> sections = std::map<string, section_t*>();
     std::map<string, symbol_t*> symbols = std::map<string, symbol_t*>();
     std::map<size_t, Elf32_Rela*> relocations = std::map<size_t, Elf32_Rela*>();
-    std::vector<string> callee = std::vector<string>();
-    string cur_sec_name = ".text";
+    std::vector<std::byte> sectionHeaders = std::vector<std::byte>();
+    std::set<string> callee = std::set<string>();
+    std::set<string> relaUse = std::set<string>();
     section_t* cur_sec = nullptr;
     symbol_t* cur_sym = nullptr;
 
     bool isText = true;
-    int pass = 0;
-    size_t currentTextOff = 0;
+    int pass = -1;
+    Elf32_Off cur_sec_off = 0;
 
     inline Elf32_Word getIInst(string op, string rd, 
                               string src, Elf32_Word imm) {
@@ -83,14 +90,7 @@ private:
       inst = addBImm(inst, imm);
       return getLittleEdian(inst);
     }
-    inline string replace(string origin, string replaced, string replaceBy) {
-      string current = origin;
-      size_t size = replaceBy.size();
-      while ((current.find(replaced)) != -1) 
-        current.replace(current.find(replaced), size, replaceBy);
-      return current;
-    }
-    inline string parseStringLiteral(string it) {
+    inline string parseStringLiteral(string it, bool addTail = false) {
       string ret = it.substr(1, it.size() - 2);
       for (int i = 0;i < ret.size();++i) {
         if (ret[i] == '\\') {
@@ -128,9 +128,21 @@ private:
           --i;
         }
       }
-      ret.push_back('\0');
+      if (addTail) ret.push_back('\0');
       return ret;
     }
+    inline size_t alignOffset(size_t curOff, size_t alignment) {
+      if (curOff % alignment) return curOff + (alignment - curOff % alignment);
+      else return curOff;
+    }
+    inline void secAlign(section_t* sec, Elf32_Off move = 0) {
+      sec->contents.resize(alignOffset(sec->contents.size() + move, sec->header.sh_addralign));
+    }    
+    template<class T>
+    inline size_t argEq(const std::vector<T> &src, T tobe) {
+      return std::find(src.begin(), src.end(), tobe) - src.begin();
+    }
+    /*--------------------------------------------------------*/
     inline void preprocess() {
       section_t* tmp;
       tmp = new section_t();
@@ -160,24 +172,105 @@ private:
       sections.insert(std::pair<string, section_t*>(".comment", tmp));
     }
     inline void alloc() {
-      // bool hasSym_tab = !symbols.empty(); todo: if not have symbol table(very rare)
-      section_t *symtab, *strtab, *shstrtab;
-      //todo
+      std::vector<string> section_order = std::vector<string>();
+      section_order.push_back(".text");
+      section_t *rela = new section_t();
+      if (!relaUse.empty()) {
+        section_order.push_back(".rela.text");
+        rela->header.sh_type = SHT_RELA;
+        rela->header.sh_flags = SHF_INFO_LINK;
+        rela->header.sh_addralign = 4;
+        sections.insert(sec_p(".rela.text", rela));
+      }
+      section_order.push_back(".data");
+      section_order.push_back(".bss");
+      section_order.push_back(".rodata");
+      for(auto iter = sections.begin(); iter != sections.end(); iter++) 
+        if (std::find(sections.begin(), sections.end(), iter->first) == sections.end()) 
+          section_order.push_back(iter->first);
+
+      section_t *symtab, *strtab, *shstrtab, *text;
+      symtab = new section_t(), strtab = new section_t(), shstrtab = new section_t();
+      text = sections[".text"];
+      std::vector<std::byte> &sym_con = symtab->contents, 
+                             &str_con = strtab->contents, 
+                             &shstr_con = shstrtab->contents;
+      symtab->header.sh_type = SHT_SYMTAB;
+      strtab->header.sh_type = SHT_STRTAB;
+      shstrtab->header.sh_type = SHT_STRTAB;
+      sections.insert(sec_p(".symtab", symtab));
+      sections.insert(sec_p(".strtab", strtab));
+      sections.insert(sec_p(".shstrtab", shstrtab));
+      
+      section_order.push_back(".symtab");
+      section_order.push_back(".strtab");
+      section_order.push_back(".shstrtab");
+
+      // fill in symtab, strtab and shstrtab
+      for (Elf32_Byte cur_bind = STB_LOCAL; cur_bind < STB_WEAK;++cur_bind) { //weak is not supported
+        for (auto iter = symbols.begin(); iter != symbols.end(); iter++) {
+          string symbolName = iter->first;
+          symbolName.push_back('\0');
+          symbol_t *sym = iter->second;
+          Elf32_Sym &symbol = sym->info;
+
+          if (sym->bind != cur_bind) continue;
+          if (sym->bind == STB_LOCAL) ++symtab->header.sh_info;
+
+          symbol.st_info = ELF32_ST_INFO(sym->bind, sym->type);
+          symbol.st_other = ELF32_ST_VISIBILITY(STV_DEFAULT); 
+            // not support directive modifying this
+          // allocate object with size and remember alignment
+          if (sym->section != text && sym->section->header.sh_type != SHT_NOBITS) {
+            symbol.st_value = sym->section->contents.size();
+            secAlign(sym->section, symbol.st_size);
+          }
+          for (size_t i = 0;i < section_order.size();++i) {
+            if (sections[section_order[i]] == sym->section) {
+              symbol.st_shndx = i;
+              break;
+            }
+          }
+          // allocate the name into strtab, get the offset to symbol
+          symbol.st_name = str_con.size();
+          str_con.insert(str_con.end(), symbolName.begin(), symbolName.end());
+        }
+      }
+      //todo: shstrtab
+
+      rela->header.sh_info = argEq<string>(section_order, ".text");
+      rela->header.sh_entsize = sizeof(Elf32_Rela);
+      rela->header.sh_link = argEq<string>(section_order, ".symtab");
+      //symtab->header.sh_info is on above. 
+      symtab->header.sh_entsize = sizeof(Elf32_Sym);
+      symtab->header.sh_link = argEq<string>(section_order, ".strtab");
     }
+
 public: 
 
   Any visitFile(AssembParser::FileContext *ctx) override {
     preprocess();
+    pass = 0;
+    cur_sym = nullptr;
+    cur_sec = sections[".text"];
+    isText = true;
+    for (auto line : ctx->line()) 
+      if (line->directive() != nullptr)
+        visit(line->directive());
     /*-------------------------------------------------------------*/
     pass = 1;
     cur_sym = nullptr;
     cur_sec = sections[".text"];
+    isText = true;
     for (auto line : ctx->line()) visit(line);
     /*-------------------------------------------------------------*/
     alloc();
     /*-------------------------------------------------------------*/
     pass = 2;
-    currentTextOff = 0;
+    cur_sym = nullptr;
+    cur_sec = sections[".text"];
+    cur_sec_off = 0;
+    isText = true;
     for (auto line : ctx->line()) visit(line);
     return 0;
   }
@@ -200,6 +293,7 @@ public:
     else if (ctx->jtype() != nullptr) visit(ctx->jtype());
     else if (ctx->ltype() != nullptr) visit(ctx->ltype());
     else assert(false);
+    if (pass == 1) secAlign(cur_sec);
     return 0;
   }
 
@@ -217,16 +311,16 @@ public:
       else if (symbol->section != cur_sec) 
         std::cerr << "Error: the symbol is in multiple sections: "
                   << name <<std::endl;
-      if (isText) {
-        if (symbol->hasOffset)
-          std::cerr << "Error: the following symbol has multiple definitions in text: " 
-                  << name << std::endl;
-        symbol->offset = cur_sec->contents.size();
-        symbol->hasOffset = true;
-      }
+
+      if (symbol->hasOffset)
+        std::cerr << "Error: the following symbol has multiple definitions: " 
+                << name << std::endl;
+      symbol->hasOffset = true;
+      if (isText) symbol->info.st_value = cur_sec->contents.size();
       cur_sym = symbol;
     } else if (pass == 2) {
       cur_sym = symbols[ctx->Symbol()->toString()];
+      cur_sec_off = cur_sym->info.st_value;
     }
     return 0;
   }
@@ -236,10 +330,10 @@ public:
     if (pass == 1) {
       cur_sec->contents.resize(cur_sec->contents.size() + 4);
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getRInst(ctx->Rop()->toString(), ctx->Reg(0)->toString(), 
         ctx->Reg(1)->toString(), ctx->Reg(2)->toString());
-      currentTextOff += 4;
+      cur_sec_off += 4;
     }
     return 0;
   }
@@ -247,12 +341,13 @@ public:
   Any visitItype(AssembParser::ItypeContext *ctx) override {
     assert(isText);
     if (pass == 1) {
+      visit(ctx->imm());
       cur_sec->contents.resize(cur_sec->contents.size() + 4);
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getIInst(ctx->Iop()->toString(), ctx->Reg(0)->toString(), 
                 ctx->Reg(1)->toString(), visit(ctx->imm()).as<Elf32_Word>()); 
-      currentTextOff += 4;
+      cur_sec_off += 4;
     }
     return 0;
   }
@@ -260,12 +355,13 @@ public:
   Any visitStype(AssembParser::StypeContext *ctx) override {
     assert(isText);
     if (pass == 1) {
+      visit(ctx->imm());
       cur_sec->contents.resize(cur_sec->contents.size() + 4);
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getSInst(ctx->Sop()->toString(), ctx->Reg(1)->toString(), 
         ctx->Reg(0)->toString(), visit(ctx->imm()).as<Elf32_Word>());
-      currentTextOff += 4;
+      cur_sec_off += 4;
     }
     return 0;
   }
@@ -273,12 +369,12 @@ public:
   Any visitBtype(AssembParser::BtypeContext *ctx) override {
     assert(isText);
     if (pass == 1) {
+      relaUse.insert(ctx->Symbol()->toString());
       cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      //todo: add relocation here?
     } else if (pass == 2) {
       //todo
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 0;
-      currentTextOff += 4;
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 0;
+      cur_sec_off += 4;
     }
     return visitChildren(ctx);
   }
@@ -286,12 +382,13 @@ public:
   Any visitUtype(AssembParser::UtypeContext *ctx) override {
     assert(isText);
     if (pass == 1) {
+      visit(ctx->imm());
       cur_sec->contents.resize(cur_sec->contents.size() + 4);
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getUInst(ctx->Uop()->toString(), ctx->Reg()->toString(), 
         visit(ctx->imm()).as<Elf32_Word>());
-      currentTextOff += 4;
+      cur_sec_off += 4;
     }
     return 0;
   }
@@ -299,12 +396,13 @@ public:
   Any visitJtype(AssembParser::JtypeContext *ctx) override {
     assert(isText);
     if (pass == 1) {
+      visit(ctx->imm());
       cur_sec->contents.resize(cur_sec->contents.size() + 4);
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getJInst(ctx->Jop()->toString(), ctx->Reg()->toString(), 
         visit(ctx->imm()).as<Elf32_Word>());
-      currentTextOff += 4;
+      cur_sec_off += 4;
     }
     return 0;
   }
@@ -312,12 +410,13 @@ public:
   Any visitLtype(AssembParser::LtypeContext *ctx) override {
     assert(isText);
     if (pass == 1) {
+      visit(ctx->imm());
       cur_sec->contents.resize(cur_sec->contents.size() + 4);
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getIInst(ctx->Lop()->toString(), ctx->Reg(0)->toString(), 
                 ctx->Reg(1)->toString(), visit(ctx->imm()).as<Elf32_Word>()); 
-      currentTextOff += 4;
+      cur_sec_off += 4;
     }
     return 0;
   }
@@ -327,9 +426,9 @@ public:
     if (pass == 1) {
       cur_sec->contents.resize(cur_sec->contents.size() + 4);
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getIInst("addi", ctx->Reg(0)->toString(), ctx->Reg(1)->toString(), 0); 
-      currentTextOff += 4;
+      cur_sec_off += 4;
     }
     return visitChildren(ctx);
   }
@@ -346,16 +445,16 @@ public:
       }
     } else if (pass == 2) {
       if (hi != 0) {
-        *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+        *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
           getUInst("lui", ctx->Reg()->toString(), hi);
-        *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff + 4) = 
+        *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off + 4) = 
           getIInst("ori", ctx->Reg()->toString(), 
             ctx->Reg()->toString(), lo);
       } else {
-        *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+        *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
           getIInst("addi", ctx->Reg()->toString(), "zero", lo);
       }
-      currentTextOff += (hi != 0) ? 8 : 4;
+      cur_sec_off += (hi != 0) ? 8 : 4;
     }
     return 0;
   }
@@ -365,9 +464,9 @@ public:
     if (pass == 1) {
       cur_sec->contents.resize(cur_sec->contents.size() + 4);
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getIInst("jalr", "zero", "ra", 0);
-      currentTextOff += 4;
+      cur_sec_off += 4;
     }
     return 0;
   }
@@ -375,10 +474,11 @@ public:
   Any visitJp(AssembParser::JpContext *ctx) override {
     assert(isText);
     if (pass == 1) {
+      relaUse.insert(ctx->Symbol()->toString());
       cur_sec->contents.resize(cur_sec->contents.size() + 4);
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 0;  //todo
-      currentTextOff += 4;
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 0;  //todo
+      cur_sec_off += 4;
     }
     return visitChildren(ctx);
   }
@@ -386,11 +486,12 @@ public:
   Any visitLd(AssembParser::LdContext *ctx) override {
     assert(isText);
     if (pass == 1) {
+      relaUse.insert(ctx->Symbol()->toString());
       cur_sec->contents.resize(cur_sec->contents.size() + 8);
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 0;  //todo
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff + 4) = 0;  //todo
-      currentTextOff += 8;
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 0;  //todo
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off + 4) = 0;  //todo
+      cur_sec_off += 8;
     }
     return visitChildren(ctx);
   }
@@ -398,11 +499,12 @@ public:
   Any visitLa(AssembParser::LaContext *ctx) override {
     assert(isText);
     if (pass == 1) {
+      relaUse.insert(ctx->Symbol()->toString());
       cur_sec->contents.resize(cur_sec->contents.size() + 8);
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 0;  //todo
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff + 4) = 0;  //todo
-      currentTextOff += 8;
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 0;  //todo
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off + 4) = 0;  //todo
+      cur_sec_off += 8;
     }
     return visitChildren(ctx);
   }
@@ -411,11 +513,11 @@ public:
     assert(isText);
     if (pass == 1) {
       cur_sec->contents.resize(cur_sec->contents.size() + 8);
-      callee.push_back(ctx->Symbol()->toString());
+      callee.insert(ctx->Symbol()->toString());
     } else if (pass == 2) {
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 0;  //todo
-      *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff + 4) = 0;  //todo
-      currentTextOff += 8;
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 0;  //todo
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off + 4) = 0;  //todo
+      cur_sec_off += 8;
     }
     return visitChildren(ctx);
   }
@@ -427,23 +529,23 @@ public:
     }else if (pass == 2) {
       string op = ctx->Szop()->toString();
       if (op == "seqz"){
-        *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+        *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
           getIInst("sltiu", ctx->Reg(0)->toString(), 
           ctx->Reg(1)->toString(), 1);
       } else if (op == "snez") {
-        *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+        *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
           getRInst("sltu", ctx->Reg(0)->toString(), 
            "zero", ctx->Reg(1)->toString());
       } else if (op == "sltz") {
-        *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+        *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
           getRInst("slt", ctx->Reg(0)->toString(), 
            ctx->Reg(1)->toString(), "zero");
       } else if (op == "sgtz") {
-        *(Elf32_Word*)(cur_sec->contents.data() + currentTextOff) = 
+        *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
           getRInst("slt", ctx->Reg(0)->toString(), 
            "zero", ctx->Reg(1)->toString());
       }
-      currentTextOff += 4;
+      cur_sec_off += 4;
     }
     return 0;
   }
@@ -451,6 +553,7 @@ public:
   Any visitBz(AssembParser::BzContext *ctx) override {
     assert(isText);
     if (pass == 1) {
+      relaUse.insert(ctx->Symbol()->toString());
       cur_sec->contents.resize(cur_sec->contents.size() + 4);
     }else if (pass == 2) {
       string op = ctx->Bzop()->toString();
@@ -467,12 +570,13 @@ public:
 
       }
       //todo
-      currentTextOff += 4;
+      cur_sec_off += 4;
     }
     return visitChildren(ctx);
   }
 
   Any visitSection(AssembParser::SectionContext *ctx) override {
+    cur_sec->offset = cur_sec_off;
     if (sections.count(ctx->Section()->toString()))
       cur_sec = sections[ctx->Section()->toString()];
     else {
@@ -481,7 +585,8 @@ public:
                                 ctx->Section()->toString(), cur_sec
                                 ));
     }
-    if (cur_sec_name == ".text") isText = true;
+    cur_sec_off = cur_sec->offset;
+    if (ctx->Section()->toString() == ".text") isText = true;
     else isText = false;
     return 0;
   }
@@ -495,11 +600,6 @@ public:
       symbol = symbols[name];
 
       symbol->bind = STB_GLOBAL;
-
-      if (symbol->section == nullptr) symbol->section = cur_sec;
-      else if (symbol->section != cur_sec) 
-        std::cerr << "Error: the symbol is in multiple sections: "
-                  << name <<std::endl;
     }
     return 0;
   }
@@ -517,11 +617,6 @@ public:
                   << name << std::endl;
       symbol->type = 
         (ctx->Type()->toString() == "@object") ? STT_OBJECT : STT_FUNC;
-
-      if (symbol->section == nullptr) symbol->section = cur_sec;
-      else if (symbol->section != cur_sec) 
-        std::cerr << "Error: the symbol is in multiple sections: "
-                  << name <<std::endl;
     }
     return 0;
   }
@@ -529,43 +624,39 @@ public:
   Any visitAlign(AssembParser::AlignContext *ctx) override {
     Elf32_Word alignment = (Elf32_Word)strtoul(ctx->Integer()->toString().c_str(), NULL, 10);
     alignment = 1 << alignment;
-    if (pass == 1) {
-      Elf32_Word moveMent = cur_sec->contents.size() % alignment;
-      if (moveMent != 0) {
-        moveMent = alignment - moveMent;
-        cur_sec->contents.resize(cur_sec->contents.size() + moveMent);
-      }
+    if (pass == 0) {
       if (cur_sec->header.sh_addralign < alignment)
         cur_sec->header.sh_addralign;
+    } else if (pass == 1) {
+      secAlign(cur_sec);
     } else if (pass == 2 && isText) {
-      if (currentTextOff % alignment != 0) 
-        currentTextOff += alignment - (currentTextOff % alignment);
+      cur_sec_off = alignOffset(cur_sec_off, cur_sec->header.sh_addralign);
     }
     return 0;
   }
 
-  Any visitSize(AssembParser::SizeContext *ctx) override {
-    if (pass == 1){
-      Elf32_Word size = (Elf32_Word)strtoul(ctx->Integer()->toString().c_str(), NULL, 10);
-      if (cur_sym->type == 1 || cur_sym->type == 2) {
-        cur_sym->info.st_size = size;
-        if (cur_sec->header.sh_type == SHT_PROGBITS)
-          cur_sec->contents.resize(cur_sec->contents.size() + size);
-      }
+  Any visitWord(AssembParser::WordContext *ctx) override {
+    if (pass == 1) {
+      if (cur_sym->type == 1 || cur_sym->type == 2) 
+        cur_sym->info.st_size += 4;
       else std::cerr << "assign size to a symbol not an object or a function" << std::endl;
+    } else if (pass == 2) {
+      Elf32_Word value = (Elf32_Word)strtoul(ctx->Integer()->toString().c_str(), NULL, 10);
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = value;
+      cur_sec_off += 4;
     }
-    return -1;
   }
 
   Any visitAsciz(AssembParser::AscizContext *ctx) override {
-    //todo
     assert(!isText);
     assert(cur_sym->bind == STB_LOCAL);
-    string value = parseStringLiteral(ctx->StringLiteral()->toString());
-    if (cur_sym->info.st_size < value.size())
-      cur_sym->info.st_size = value.size();
-    if (pass == 2) {
-      //todo: add to contents in pass 2
+    string value = parseStringLiteral(ctx->StringLiteral()->toString(), true);
+    if (pass == 1) {
+      cur_sym->info.st_size += value.length();
+    } else if (pass == 2) {
+      for (size_t i = 0;i < value.length();++i)
+        cur_sec->contents[i + cur_sec_off] = value[i];
+      cur_sec_off += value.length();
     }
     return 0;
   }
@@ -601,7 +692,10 @@ public:
   }
 
   Any visitRelocation(AssembParser::RelocationContext *ctx) override {
-    if (pass == 1) return (Elf32_Word)0;
+    if (pass == 1) {
+      relaUse.insert(ctx->Symbol()->toString());
+      return (Elf32_Word)0;
+    }
     else if (pass == 2) {
       //todo
     }

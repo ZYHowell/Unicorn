@@ -59,33 +59,38 @@ then start of padding bytes
 
 ##### ehdr(ELF header)
 
-e_ident: see above
-
-e_phoff: program header offset
-
-e_phnum: program header number
-
-e_shoff: section header offset
-
-e_shnum: section header number(sepcial judge for the number geq 0xff00, but I do not have such kind of consideration so...)
-
-by definition, phdr_end=e_phoff + e_phnum * sizeof(phdr), so is shdr_end
-
-e_phentsize, e_shentsize: size of program header/section header
-
-e_ehsize: size of extension header
-
-e_version: 0 for invalid and 1 for valid
-
-e_type: 1 for relocatable(always this), 2 for executable, 3 for shared object, 4 for core, 0xff00 and oxffff for processor specific
-
-e_flags: 0x1, 0x2, 0x4, 0x6, 0x8, 0x10: RVC(c-extension), FLOAT_ABI_SINGLE, FLOAT_ABI_DOUBLE(simply use this is OK for our output.s), FLOAT_ABI_QUAD, RVE(e-extension), TSO. 
-
-e_machine: 243 for riscv(btw, 62 for x86, and RISCV is so special that any other machine code is not greater than 224)
-
-e_entry: the address from where the process starts executing
-
-e_shstrndx: index of section name string table. (special judge if the file has no section name string table, but... )
+```C
+typedef struct {
+	Elf32_Byte  e_ident[16];  
+    	//see above
+	Elf32_Half  e_type;              
+    	//1 for relocatable(always this), 2 for executable, 3 for shared object, 4 for core, 0xff00 and oxffff for processor specific
+	Elf32_Half  e_machine;           
+    	//243 for riscv(btw, 62 for x86, and RISCV is so special that any other machine code is not greater than 224)
+	Elf32_Word  e_version;           
+    	//0 for invalid and 1 for valid
+	Elf32_Addr  e_entry;             
+    	//the address from where the process starts executing
+	Elf32_Off   e_phoff;             
+    	//program header offset
+	Elf32_Off   e_shoff;             
+    	//Section header offset
+	Elf32_Word  e_flags;             
+    	//0x1, 0x2, 0x4, 0x6, 0x8, 0x10: RVC(c-extension), FLOAT_ABI_SINGLE, FLOAT_ABI_DOUBLE(simply use this is OK for our output.s), FLOAT_ABI_QUAD, RVE(e-extension), TSO. 
+	Elf32_Half  e_ehsize;            
+    	// ELF header size 
+	Elf32_Half  e_phentsize;         
+    	// Size of program header
+	Elf32_Half  e_phnum;             
+    	// Number of program header
+	Elf32_Half  e_shentsize;         
+    	// Size of section header
+	Elf32_Half  e_shnum;             
+    	// Number of section header
+	Elf32_Half  e_shstrndx;          
+    	//index of section name string table. (special judge if the file has no section name string table, but... )
+} Elf32_Ehdr;
+```
 
 ##### phdr(program header)
 

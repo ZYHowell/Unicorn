@@ -67,7 +67,7 @@ public:
 
     virtual antlrcpp::Any visitAlign(AssembParser::AlignContext *context) = 0;
 
-    virtual antlrcpp::Any visitSize(AssembParser::SizeContext *context) = 0;
+    virtual antlrcpp::Any visitWord(AssembParser::WordContext *context) = 0;
 
     virtual antlrcpp::Any visitAsciz(AssembParser::AscizContext *context) = 0;
 

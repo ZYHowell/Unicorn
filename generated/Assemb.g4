@@ -31,7 +31,7 @@ directive
     | '.globl' symbol=Symbol                #globl
     | '.type' symbol=Symbol ',' Type        #type
     | ('.p2align' | '.align') Integer       #align
-    | '.size' Integer                       #size
+    | '.word' Integer                       #word
     | ('.asciz' | '.string') StringLiteral  #asciz
     | '.file' name=StringLiteral            #filename
     | IgnoreDirective                       #ignore

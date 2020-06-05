@@ -427,17 +427,6 @@ public:
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
-  class  SizeContext : public DirectiveContext {
-  public:
-    SizeContext(DirectiveContext *ctx);
-
-    antlr4::tree::TerminalNode *Integer();
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
   class  IgnoreContext : public DirectiveContext {
   public:
     IgnoreContext(DirectiveContext *ctx);
@@ -488,6 +477,17 @@ public:
   class  AlignContext : public DirectiveContext {
   public:
     AlignContext(DirectiveContext *ctx);
+
+    antlr4::tree::TerminalNode *Integer();
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  WordContext : public DirectiveContext {
+  public:
+    WordContext(DirectiveContext *ctx);
 
     antlr4::tree::TerminalNode *Integer();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;

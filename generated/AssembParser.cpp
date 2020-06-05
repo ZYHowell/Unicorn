@@ -1410,31 +1410,6 @@ antlrcpp::Any AssembParser::FilenameContext::accept(tree::ParseTreeVisitor *visi
   else
     return visitor->visitChildren(this);
 }
-//----------------- SizeContext ------------------------------------------------------------------
-
-tree::TerminalNode* AssembParser::SizeContext::Integer() {
-  return getToken(AssembParser::Integer, 0);
-}
-
-AssembParser::SizeContext::SizeContext(DirectiveContext *ctx) { copyFrom(ctx); }
-
-void AssembParser::SizeContext::enterRule(tree::ParseTreeListener *listener) {
-  auto parserListener = dynamic_cast<AssembListener *>(listener);
-  if (parserListener != nullptr)
-    parserListener->enterSize(this);
-}
-void AssembParser::SizeContext::exitRule(tree::ParseTreeListener *listener) {
-  auto parserListener = dynamic_cast<AssembListener *>(listener);
-  if (parserListener != nullptr)
-    parserListener->exitSize(this);
-}
-
-antlrcpp::Any AssembParser::SizeContext::accept(tree::ParseTreeVisitor *visitor) {
-  if (auto parserVisitor = dynamic_cast<AssembVisitor*>(visitor))
-    return parserVisitor->visitSize(this);
-  else
-    return visitor->visitChildren(this);
-}
 //----------------- IgnoreContext ------------------------------------------------------------------
 
 tree::TerminalNode* AssembParser::IgnoreContext::IgnoreDirective() {
@@ -1564,6 +1539,31 @@ antlrcpp::Any AssembParser::AlignContext::accept(tree::ParseTreeVisitor *visitor
   else
     return visitor->visitChildren(this);
 }
+//----------------- WordContext ------------------------------------------------------------------
+
+tree::TerminalNode* AssembParser::WordContext::Integer() {
+  return getToken(AssembParser::Integer, 0);
+}
+
+AssembParser::WordContext::WordContext(DirectiveContext *ctx) { copyFrom(ctx); }
+
+void AssembParser::WordContext::enterRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<AssembListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->enterWord(this);
+}
+void AssembParser::WordContext::exitRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<AssembListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->exitWord(this);
+}
+
+antlrcpp::Any AssembParser::WordContext::accept(tree::ParseTreeVisitor *visitor) {
+  if (auto parserVisitor = dynamic_cast<AssembVisitor*>(visitor))
+    return parserVisitor->visitWord(this);
+  else
+    return visitor->visitChildren(this);
+}
 //----------------- AscizContext ------------------------------------------------------------------
 
 tree::TerminalNode* AssembParser::AscizContext::StringLiteral() {
@@ -1654,7 +1654,7 @@ AssembParser::DirectiveContext* AssembParser::directive() {
       }
 
       case AssembParser::T__14: {
-        _localctx = dynamic_cast<DirectiveContext *>(_tracker.createInstance<AssembParser::SizeContext>(_localctx));
+        _localctx = dynamic_cast<DirectiveContext *>(_tracker.createInstance<AssembParser::WordContext>(_localctx));
         enterOuterAlt(_localctx, 5);
         setState(143);
         match(AssembParser::T__14);
@@ -1875,7 +1875,7 @@ std::vector<std::string> AssembParser::_ruleNames = {
 
 std::vector<std::string> AssembParser::_literalNames = {
   "", "':'", "','", "'('", "')'", "'mv'", "'li'", "'ret'", "'j'", "'la'", 
-  "'call'", "'.globl'", "'.type'", "'.p2align'", "'.align'", "'.size'", 
+  "'call'", "'.globl'", "'.type'", "'.p2align'", "'.align'", "'.word'", 
   "'.asciz'", "'.string'", "'.file'", "", "", "", "", "", "", "", "'jal'"
 };
 

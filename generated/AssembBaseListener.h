@@ -88,8 +88,8 @@ public:
   virtual void enterAlign(AssembParser::AlignContext * /*ctx*/) override { }
   virtual void exitAlign(AssembParser::AlignContext * /*ctx*/) override { }
 
-  virtual void enterSize(AssembParser::SizeContext * /*ctx*/) override { }
-  virtual void exitSize(AssembParser::SizeContext * /*ctx*/) override { }
+  virtual void enterWord(AssembParser::WordContext * /*ctx*/) override { }
+  virtual void exitWord(AssembParser::WordContext * /*ctx*/) override { }
 
   virtual void enterAsciz(AssembParser::AscizContext * /*ctx*/) override { }
   virtual void exitAsciz(AssembParser::AscizContext * /*ctx*/) override { }

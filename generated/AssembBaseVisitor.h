@@ -111,7 +111,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSize(AssembParser::SizeContext *ctx) override {
+  virtual antlrcpp::Any visitWord(AssembParser::WordContext *ctx) override {
     return visitChildren(ctx);
   }
 

@@ -14,7 +14,7 @@ null
 '.type'
 '.p2align'
 '.align'
-'.size'
+'.word'
 '.asciz'
 '.string'
 '.file'
