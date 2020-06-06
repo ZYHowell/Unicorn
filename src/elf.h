@@ -147,6 +147,20 @@ typedef struct {
 } Elf32_Shdr;
 /*-----------------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------------*/
+enum {
+	R_RISCV_NONE = 0,                /* xx,       None                         */
+	R_RISCV_BRANCH = 16,             /* 32, 12:1  PC-relative branch offset                          SB-Type (beq,bne,blt,bge,bltu,bgeu) */
+	R_RISCV_JAL = 17,                /* 32, 20:1  PC-relative jump offset                            UJ-Type (jal) */
+	R_RISCV_CALL = 18,               /* 64, 31:0  PC-relative function call                          MACRO call (auipc+jalr) */
+	R_RISCV_CALL_PLT = 19,           /* 64, 31:0  PC-relative function call                          MACRO tail (auipc+jalr) */
+	R_RISCV_PCREL_HI20 = 23,         /* 32, 31:12 PC-relative reference         %pcrel_hi(symbol)    U-Type (auipc) */
+	R_RISCV_PCREL_LO12_I = 24,       /* 32, 11:0  PC-relative reference         %pcrel_lo(label)     I-Type (lb,lbu,lh,lhu,lw,lwu,flw,fld,addi,addiw) */
+	R_RISCV_PCREL_LO12_S = 25,       /* 32, 11:0  PC-relative reference         %pcrel_lo(label)     S-Type (sb,sh,sw,fsw,fsd) */
+	R_RISCV_HI20 = 26,               /* 32, 31:12 Absolute address              %hi(symbol)          U-Type (lui,auipc) */
+	R_RISCV_LO12_I = 27,             /* 32, 11:0  Absolute address              %lo(symbol)          I-Type (lb,lbu,lh,lhu,lw,lwu,flw,fld,addi,addiw) */
+	R_RISCV_LO12_S = 28,             /* 32, 11:0  Absolute address              %lo(symbol)          S-Type (sb,sh,sw,fsw,fsd) */
+	R_RISCV_RELAX = 51,              /*           Reloc pair can be relaxed */
+};
 typedef struct {
 	Elf32_Addr	r_offset;	
 	Elf32_Word	r_info;

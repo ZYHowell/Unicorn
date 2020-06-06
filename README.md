@@ -17,8 +17,6 @@ The error detector is not complete either.
 
 ☝Better than me
 
-​			——D.J.Trump
-
 see http://www.sco.com/developers/gabi for more details about the standard. 
 
 #### Format for linking view
@@ -126,7 +124,7 @@ typedef struct {
     	//the section header index of the associated symbol/string table; so .rela.text->.symtab, .symtab->.strtab
 	Elf32_Word	sh_info;
     	//only for .rela.text and .symtab in Unicorn
-     	//In rela, the section header index of the section to which the relocation applies. 
+     	//In rela, the section header index of the section to which the relocation applies. (so .text)
     	//In symtab, the number 1 greater than the symbol table index of the last local symbol. (0-base)
 	Elf32_Word	sh_addralign;
     	//alignment constraints. 0 and 1 means no alignment constraints. (but always 0x4 except for.strtab and .shstrtab)
