@@ -55,6 +55,7 @@ private:
     char instType;
     int pass = -1;
     Elf32_Off cur_sec_off = 0;
+    size_t cur_align = 4;
 
     inline Elf32_Word getIInst(string op, string rd, 
                               string src, Elf32_Word imm) {
@@ -62,7 +63,7 @@ private:
       inst = addRd(inst, regMap[rd]);
       inst = addR1(inst, regMap[src]);
       inst = addIImm(inst, imm);
-      return getLittleEdian(inst);
+      return bswap32(inst);
     }
     inline Elf32_Word getRInst(string op, string rd, 
                               string src1, string src2) {
@@ -70,7 +71,7 @@ private:
       inst = addRd(inst, regMap[rd]);
       inst = addR1(inst, regMap[src1]);
       inst = addR2(inst, regMap[src2]);
-      return getLittleEdian(inst);
+      return bswap32(inst);
     }
     inline Elf32_Word getSInst(string op, string src1, string src2, 
                               Elf32_Word imm) {
@@ -78,19 +79,19 @@ private:
       inst = addR1(inst, regMap[src1]);
       inst = addR2(inst, regMap[src2]);
       inst = addSImm(inst, imm);
-      return getLittleEdian(inst);
+      return bswap32(inst);
     }
     inline Elf32_Word getUInst(string op, string rd, Elf32_Word imm) {
       Elf32_Word inst = instFormat[op];
       inst = addRd(inst, regMap[rd]);
       inst = addUImm(inst, imm);
-      return getLittleEdian(inst);
+      return bswap32(inst);
     }
     inline Elf32_Word getJInst(string op, string rd, Elf32_Word imm) {
       Elf32_Word inst = instFormat[op];
       inst = addRd(inst, regMap[rd]);
       inst = addJImm(inst, imm);
-      return getLittleEdian(inst);
+      return bswap32(inst);
     }
     inline Elf32_Word getBInst(string op, string src1, 
                               string src2, Elf32_Word imm) {
@@ -98,7 +99,7 @@ private:
       inst = addR1(inst, regMap[src1]);
       inst = addR2(inst, regMap[src2]);
       inst = addBImm(inst, imm);
-      return getLittleEdian(inst);
+      return bswap32(inst);
     }
     inline string parseStringLiteral(string it, bool addTail = false) {
       string ret = it.substr(1, it.size() - 2);
@@ -197,6 +198,9 @@ private:
       sections.insert(std::pair<string, section_t*>(".comment", tmp));
     }
     inline void alloc() {
+      section_order.push_back("");
+      sections.insert(sec_p("", new section_t()));
+      sections[""]->header.sh_addralign = 0;
       section_order.push_back(".text");
       section_t *rela = new section_t();
       if (!relaUse.empty()) {
@@ -217,8 +221,7 @@ private:
       symtab = new section_t(), strtab = new section_t(), shstrtab = new section_t();
       text = sections[".text"];
       std::vector<std::byte> &sym_con = symtab->contents, 
-                             &str_con = strtab->contents, 
-                             &shstr_con = shstrtab->contents;
+                             &str_con = strtab->contents;
       symtab->header.sh_type = SHT_SYMTAB;
       symtab->header.sh_addralign = 4;
       strtab->header.sh_type = SHT_STRTAB;
@@ -232,6 +235,11 @@ private:
       section_order.push_back(".shstrtab");
 
       // fill in symtab, strtab and shstrtab
+      sym_con.resize(sizeof(Elf32_Sym));
+      *(Elf32_Sym *)(sym_con.data()) = Elf32_Sym();
+      str_con.push_back(std::byte(0x0));
+      sym_con.resize(sym_con.size() + sizeof(Elf32_Sym) * symbols.size());
+      size_t num = 0;
       for (Elf32_Byte cur_bind = STB_LOCAL; cur_bind < STB_WEAK;++cur_bind) { //weak is not supported
         for (auto iter = symbols.begin(); iter != symbols.end(); iter++) {
           string symbolName = iter->first;
@@ -257,9 +265,12 @@ private:
               break;
             }
           }
-          // allocate the name into strtab, get the offset to symbol
+          // allocate the name into strtab, get the offset to symbol name
           symbol.st_name = str_con.size();
           str_con.insert(str_con.end(), symbolName.begin(), symbolName.end());
+          //add it to symbol table
+          symbol.reverse((Elf32_Sym *)(sym_con.data() + num * sizeof(Elf32_Sym)));
+          ++num;
         }
       }
       //add those not allocatable to symbols. 
@@ -274,6 +285,10 @@ private:
           outer.insert(rela);
           symbol->info.st_name = str_con.size();
           str_con.insert(str_con.end(), rela.begin(), rela.end());
+
+          size_t size = sym_con.size();
+          sym_con.resize(size + sizeof(Elf32_Sym));
+          symbol->info.reverse((Elf32_Sym *)(sym_con.data() + size));
         }
       }
 
@@ -287,11 +302,37 @@ private:
     }
     inline void final() {
       std::vector<std::byte> &shstr_con = sections[".shstrtab"]->contents;
+      Elf32_Ehdr ehdr;
+      ehdr.e_ident[EI_MAG0] = ELFMAG0;
+      ehdr.e_ident[EI_MAG1] = ELFMAG1;
+      ehdr.e_ident[EI_MAG2] = ELFMAG2;
+      ehdr.e_ident[EI_MAG3] = ELFMAG3;
+      ehdr.e_ident[EI_CLASS] = ELFCLASS32;
+      ehdr.e_ident[EI_DATA] = ELFDATA2LSB;
+      ehdr.e_ident[EI_VERSION] = EV_CURRENT;
+      ehdr.e_ident[EI_OSABI] = ELFOSABI_LINUX;
+      //abi version is none
+      ehdr.e_type = ET_REL;
+      ehdr.e_machine = EM_RISCV;
+      ehdr.e_version = EV_CURRENT;
+      ehdr.e_entry = 0;
+      ehdr.e_phoff = 0;
+      ehdr.e_flags = 0x4;
+      ehdr.e_ehsize = sizeof(Elf32_Ehdr);
+      ehdr.e_phentsize = sizeof(Elf32_Phdr);
+      ehdr.e_phnum = 0;
+      ehdr.e_shentsize = sizeof(Elf32_Shdr);
+      ehdr.e_shnum = section_order.size();
+      ehdr.e_shstrndx = argEq<string>(section_order, ".shstrtab");
+      
+
       if (!relaUse.empty()) {
         std::vector<std::byte> &rela_con = sections[".rela.text"]->contents;
-        rela_con.insert(rela_con.end(), relocations.begin(), relocations.end());
+        rela_con.resize(sizeof(Elf32_Rela) * relocations.size());
+        for (size_t i = 0;i < relocations.size();++i) 
+          relocations[0].reverse((Elf32_Rela *)(rela_con.data() + i * sizeof(Elf32_Rela)));
       }
-      storage.resize(sizeof(Elf32_Ehdr) + (section_order.size() + 1) * sizeof(Elf32_Shdr));
+      storage.resize(sizeof(Elf32_Ehdr));
       //shstrtab and section headers
       //solved attr here: name, offset, size
       for (auto name : section_order) {
@@ -305,23 +346,24 @@ private:
         shdr.sh_size = sec->contents.size();
         storage.resize(storage.size() + shdr.sh_size);
       }
+      storage.resize(alignOffset(storage.size(), 4));
+      ehdr.e_shoff = storage.size();
+      storage.resize(storage.size() + section_order.size() * sizeof(Elf32_Shdr));
 
-      //todo: ehdr
-      Elf32_Ehdr ehdr;
       std::byte *ptr = storage.data();
       Elf32_Off offset = 0;
-      *(Elf32_Ehdr *)(ptr + offset) = ehdr;
-      //todo: infact, section header is after contents instead of before it. 
+      ehdr.reverse((Elf32_Ehdr *)ptr);
       offset += sizeof(Elf32_Ehdr);
-      for (auto sec: section_order) {
-        *(Elf32_Shdr *)(ptr + offset) = sections[sec]->header;
-        offset += sizeof(Elf32_Shdr);
-      }
       for (auto sec: section_order) {
         std::vector<std::byte> &section = sections[sec]->contents;
         offset = sections[sec]->header.sh_offset;
         for (size_t i = 0;i < section.size();++i)
           storage[offset + i] = section[i];
+      }
+      offset = alignOffset(offset, 4);
+      for (auto sec: section_order) {
+        sections[sec]->header.reverse((Elf32_Shdr *)(ptr + offset));
+        offset += sizeof(Elf32_Shdr);
       }
     }
 
@@ -350,6 +392,7 @@ public:
     cur_sec = sections[".text"];
     cur_sec_off = 0;
     isText = true;
+    cur_align = cur_sec->header.sh_addralign;
     for (auto line : ctx->line()) visit(line);
     /*-------------------------------------------------------------*/
     //get the elf header and copy all to storage
@@ -363,6 +406,7 @@ public:
     else if (ctx->directive() != nullptr) visit(ctx->directive());
     else if (ctx->start() != nullptr) visit(ctx->start());
     else assert(false);
+    if (pass == 2) cur_sec_off = alignOffset(cur_sec_off, cur_align);
     return 0;
   }
 
@@ -375,7 +419,6 @@ public:
     else if (ctx->jtype() != nullptr) visit(ctx->jtype());
     else if (ctx->ltype() != nullptr) visit(ctx->ltype());
     else assert(false);
-    if (pass == 1) secAlign(cur_sec);
     return 0;
   }
 
@@ -410,7 +453,7 @@ public:
   Any visitRtype(AssembParser::RtypeContext *ctx) override {
     assert(isText);
     if (pass == 1) {
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getRInst(ctx->Rop()->toString(), ctx->Reg(0)->toString(), 
@@ -424,7 +467,7 @@ public:
     assert(isText);
     if (pass == 1) {
       visit(ctx->imm());
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       instType = IType;
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
@@ -439,7 +482,7 @@ public:
     assert(isText);
     if (pass == 1) {
       visit(ctx->imm());
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       instType = SType;
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
@@ -454,21 +497,21 @@ public:
     assert(isText);
     if (pass == 1) {
       relaUse.insert(ctx->Symbol()->toString());
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getBInst(ctx->Bop()->toString(), ctx->Reg(0)->toString(), 
         ctx->Reg(1)->toString(), getRelaOf(ctx->Symbol()->toString(), R_RISCV_BRANCH));
       cur_sec_off += 4;
     }
-    return visitChildren(ctx);
+    return 0;
   }
 
   Any visitUtype(AssembParser::UtypeContext *ctx) override {
     assert(isText);
     if (pass == 1) {
       visit(ctx->imm());
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       instType = UType;
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
@@ -483,7 +526,7 @@ public:
     assert(isText);
     if (pass == 1) {
       visit(ctx->imm());
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       instType = JType;
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
@@ -498,7 +541,7 @@ public:
     assert(isText);
     if (pass == 1) {
       visit(ctx->imm());
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       instType = IType;
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
@@ -512,14 +555,13 @@ public:
   Any visitMv(AssembParser::MvContext *ctx) override {
     assert(isText);
     if (pass == 1) {
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      secAlign(cur_sec);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getIInst("addi", ctx->Reg(0)->toString(), ctx->Reg(1)->toString(), 0); 
       cur_sec_off += 4;
     }
-    return visitChildren(ctx);
+    return 0;
   }
 
   Any visitLi(AssembParser::LiContext *ctx) override {
@@ -528,26 +570,22 @@ public:
     Elf32_Word value = visit(ctx->imm()).as<Elf32_Word>();
     Elf32_Word hi = value >> 12u, lo = value & 0xfffu;
     if (pass == 1) {
-      if (hi != 0) {
-        cur_sec->contents.resize(cur_sec->contents.size() + 4);
-        secAlign(cur_sec);
-        cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      } else {
-        cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      }
-      secAlign(cur_sec);
+      if (hi != 0) secAlign(cur_sec, 4);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       if (hi != 0) {
         *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
           getUInst("lui", ctx->Reg()->toString(), hi);
-        *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off + 4) = 
+        cur_sec_off = alignOffset(cur_sec_off + 4, cur_align);
+
+        *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
           getIInst("ori", ctx->Reg()->toString(), 
             ctx->Reg()->toString(), lo);
       } else {
         *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
           getIInst("addi", ctx->Reg()->toString(), "zero", lo);
       }
-      cur_sec_off += (hi != 0) ? 8 : 4;
+      cur_sec_off += 4;
     }
     return 0;
   }
@@ -555,8 +593,7 @@ public:
   Any visitRet(AssembParser::RetContext *ctx) override {
     assert(isText);
     if (pass == 1) {
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      secAlign(cur_sec);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getIInst("jalr", "zero", "ra", 0);
@@ -569,8 +606,7 @@ public:
     assert(isText);
     if (pass == 1) {
       relaUse.insert(ctx->Symbol()->toString());
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      secAlign(cur_sec);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getJInst("jal", "zero", getRelaOf(ctx->Symbol()->toString(), R_RISCV_JAL));
@@ -583,37 +619,33 @@ public:
     assert(isText);
     if (pass == 1) {
       relaUse.insert(ctx->Symbol()->toString());
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      secAlign(cur_sec);
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      secAlign(cur_sec);
+      secAlign(cur_sec, 4);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       string rd = ctx->Reg()->toString(), sym = ctx->Reg()->toString();
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getUInst("lui", rd, getRelaOf(sym, R_RISCV_PCREL_HI20));
-      cur_sec_off += 4;
-      secAlign(cur_sec);
+      cur_sec_off = alignOffset(cur_sec_off + 4, cur_align);
+
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getIInst(ctx->Lop()->toString(), rd, rd, R_RISCV_PCREL_LO12_I);
       cur_sec_off += 4;
     }
-    return visitChildren(ctx);
+    return 0;
   }
 
   Any visitLa(AssembParser::LaContext *ctx) override {
     assert(isText);
     if (pass == 1) {
       relaUse.insert(ctx->Symbol()->toString());
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      secAlign(cur_sec);
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      secAlign(cur_sec);
+      secAlign(cur_sec, 4);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       string symbol = ctx->Symbol()->toString(), reg = ctx->Reg()->toString();
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getUInst("lui", reg, getRelaOf(symbol, R_RISCV_HI20) >> 12);
-      cur_sec_off += 4;
-      secAlign(cur_sec);
+      cur_sec_off = alignOffset(cur_sec_off + 4, cur_align);
+
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getIInst("addi", reg, reg, getRelaOf(symbol, R_RISCV_LO12_I) & ((1 << 11) - 1));
       cur_sec_off += 4;
@@ -624,17 +656,15 @@ public:
   Any visitCall(AssembParser::CallContext *ctx) override {
     assert(isText);
     if (pass == 1) {
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      secAlign(cur_sec);
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      secAlign(cur_sec);
       relaUse.insert(ctx->Symbol()->toString());
+      secAlign(cur_sec, 4);
+      secAlign(cur_sec, 4);
     } else if (pass == 2) {
       Elf32_Word value = getRelaOf(ctx->Symbol()->toString(), R_RISCV_CALL);
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getUInst("auipc", "t1", value >> 12);
-      cur_sec_off += 4;
-      secAlign(cur_sec);
+      cur_sec_off = alignOffset(cur_sec_off + 4, cur_align);
+
       *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = 
         getIInst("jalr", "ra", "t1", value & ((1 << 11) - 1));
       cur_sec_off += 4;
@@ -645,8 +675,7 @@ public:
   Any visitSz(AssembParser::SzContext *ctx) override {
     assert(isText);
     if (pass == 1) {
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      secAlign(cur_sec);
+      secAlign(cur_sec, 4);
     }else if (pass == 2) {
       string op = ctx->Szop()->toString();
       if (op == "seqz"){
@@ -675,8 +704,7 @@ public:
     assert(isText);
     if (pass == 1) {
       relaUse.insert(ctx->Symbol()->toString());
-      cur_sec->contents.resize(cur_sec->contents.size() + 4);
-      secAlign(cur_sec);
+      secAlign(cur_sec, 4);
     }else if (pass == 2) {
       string op = ctx->Bzop()->toString();
       if (op == "beqz") {
@@ -720,6 +748,7 @@ public:
                                 ));
     }
     cur_sec_off = cur_sec->offset;
+    cur_align = cur_sec->header.sh_addralign;
     if (ctx->Section()->toString() == ".text") isText = true;
     else isText = false;
     return 0;
@@ -776,7 +805,7 @@ public:
       else std::cerr << "assign size to a symbol not an object or a function" << std::endl;
     } else if (pass == 2) {
       Elf32_Word value = (Elf32_Word)strtoul(ctx->Integer()->toString().c_str(), NULL, 10);
-      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = value;
+      *(Elf32_Word*)(cur_sec->contents.data() + cur_sec_off) = bswap32(value);
       cur_sec_off += 4;
     }
   }
@@ -795,7 +824,7 @@ public:
     return 0;
   }
 
-  antlrcpp::Any visitFilename(AssembParser::FilenameContext *ctx) override {
+  Any visitFilename(AssembParser::FilenameContext *ctx) override {
     if (pass == 1) {
       string name = parseStringLiteral(ctx->StringLiteral()->toString());
       if (symbols.count(name))

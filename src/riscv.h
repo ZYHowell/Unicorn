@@ -84,11 +84,15 @@ inline Elf32_Word addUImm(Elf32_Word inst, Elf32_Word imm) {
 inline Elf32_Word addJImm(Elf32_Word inst, Elf32_Word imm) {
     return apply(inst, ImmJformat(imm), 12, 20);
 }
-inline Elf32_Word getLittleEdian(Elf32_Word inst) {
-    return (slice(inst, 7, 0) << 24) | 
-            (slice(inst, 15, 8) << 16) | 
-            (slice(inst, 23, 16) << 8) | 
-            (slice(inst, 31, 24) << 0);
+inline Elf32_Word bswap32(Elf32_Word src) {
+    return (slice(src, 7, 0) << 24) | 
+            (slice(src, 15, 8) << 16) | 
+            (slice(src, 23, 16) << 8) | 
+            (slice(src, 31, 24) << 0);
+}
+inline Elf32_Half bswap16(Elf32_Half src) {
+    return (slice(src, 7, 0) << 8) | 
+            (slice(src, 15, 8) <<0);
 }
 };
 #endif

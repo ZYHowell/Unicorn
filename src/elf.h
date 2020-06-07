@@ -93,8 +93,35 @@ typedef struct {
 	Elf32_Half  e_shentsize;         /* Size of section header entry */
 	Elf32_Half  e_shnum;             /* Number of section header entries */
 	Elf32_Half  e_shstrndx;          /* Section name string table index */
+	void reverse(Elf32_Ehdr *it) {
+		for (size_t i = 0;i < 16;++i) it->e_ident[i] = e_ident[i];
+		it->e_type = Unicorn::bswap16(e_type);
+		it->e_machine = Unicorn::bswap16(e_machine);
+		it->e_version = Unicorn::bswap32(e_version);
+		it->e_entry = Unicorn::bswap32(e_entry);
+		it->e_phoff = Unicorn::bswap32(e_phoff);
+		it->e_shoff = Unicorn::bswap32(e_shoff);
+		it->e_flags = Unicorn::bswap32(e_flags);
+		it->e_ehsize = Unicorn::bswap16(e_ehsize);
+		it->e_phentsize = Unicorn::bswap16(e_phentsize);
+		it->e_phnum = Unicorn::bswap16(e_phnum);
+		it->e_shentsize = Unicorn::bswap16(e_shentsize);
+		it->e_shnum = Unicorn::bswap16(e_shnum);
+		it->e_shstrndx = Unicorn::bswap16(e_shstrndx);
+	}
 } Elf32_Ehdr;
 /*-----------------------------------------------------------------------------*/
+// Elf32_Phdr
+typedef struct {
+	Elf32_Word  p_type;              /* Type of segment */
+	Elf32_Off   p_offset;            /* Offset in file */
+	Elf32_Addr  p_vaddr;             /* Virtual address in memory */
+	Elf32_Addr  p_paddr;             /* Physical address in memory (if applicable) */
+	Elf32_Word  p_filesz;            /* Size of segment in file */
+	Elf32_Word  p_memsz;             /* Size of segment in memory */ 
+	Elf32_Word  p_flags;             /* Segment attributes */
+	Elf32_Word  p_align;             /* Alignment of segment */
+} Elf32_Phdr;
 /*-----------------------------------------------------------------------------*/
 // sh_name
 enum {
@@ -144,6 +171,18 @@ typedef struct {
 	Elf32_Word  sh_info;             /* Miscellaneous information */
 	Elf32_Word  sh_addralign;        /* Address alignment boundary */
 	Elf32_Word  sh_entsize;          /* Size of entries, if section has table */
+	void reverse(Elf32_Shdr *it) {
+		it->sh_name = Unicorn::bswap32(sh_name);
+		it->sh_type = Unicorn::bswap32(sh_type);
+		it->sh_flags = Unicorn::bswap32(sh_flags);
+		it->sh_addr = Unicorn::bswap32(sh_addr);
+		it->sh_offset = Unicorn::bswap32(sh_offset);
+		it->sh_size = Unicorn::bswap32(sh_size);
+		it->sh_link = Unicorn::bswap32(sh_link);
+		it->sh_info = Unicorn::bswap32(sh_info);
+		it->sh_addralign = Unicorn::bswap32(sh_addralign);
+		it->sh_entsize = Unicorn::bswap32(sh_entsize);
+	}
 } Elf32_Shdr;
 /*-----------------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------------*/
@@ -165,6 +204,11 @@ typedef struct {
 	Elf32_Addr	r_offset;	
 	Elf32_Word	r_info;
 	Elf32_Sword	r_addend;
+	void reverse(Elf32_Rela *it) {
+		it->r_offset = Unicorn::bswap32(r_offset);
+		it->r_info = Unicorn::bswap32(r_info);
+		it->r_addend = Unicorn::bswap32(r_addend);
+	}
 } Elf32_Rela;
 /*-----------------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------------*/
@@ -215,6 +259,14 @@ typedef struct {
 	Elf32_Byte	st_info;
 	Elf32_Byte	st_other;
 	Elf32_Half	st_shndx;
+	void reverse(Elf32_Sym *it) {
+		it->st_name = Unicorn::bswap32(st_name);
+		it->st_value = Unicorn::bswap32(st_value);
+		it->st_size = Unicorn::bswap32(st_size);
+		it->st_info = st_info;
+		it->st_other = st_other;
+		it->st_shndx = Unicorn::bswap16(st_shndx);
+	}
 } Elf32_Sym;
 
 #endif
