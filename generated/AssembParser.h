@@ -14,11 +14,11 @@ public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
-    T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, Section = 19, Type = 20, 
-    Rop = 21, Iop = 22, Sop = 23, Bop = 24, Uop = 25, Jop = 26, Lop = 27, 
-    Szop = 28, Bzop = 29, Reg = 30, Symbol = 31, StringLiteral = 32, HL = 33, 
-    Integer = 34, DecimalInteger = 35, IgnoreDirective = 36, Whitespace = 37, 
-    Newline = 38, LineComment = 39
+    T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, Section = 20, 
+    Type = 21, Rop = 22, Iop = 23, Sop = 24, Bop = 25, Uop = 26, Jop = 27, 
+    Lop = 28, Szop = 29, Bzop = 30, Reg = 31, Directive = 32, Symbol = 33, 
+    StringLiteral = 34, HL = 35, Integer = 36, DecimalInteger = 37, Whitespace = 38, 
+    Newline = 39, LineComment = 40
   };
 
   enum {
@@ -421,17 +421,6 @@ public:
 
     antlr4::Token *name = nullptr;
     antlr4::tree::TerminalNode *StringLiteral();
-    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
-    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
-
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  IgnoreContext : public DirectiveContext {
-  public:
-    IgnoreContext(DirectiveContext *ctx);
-
-    antlr4::tree::TerminalNode *IgnoreDirective();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
 

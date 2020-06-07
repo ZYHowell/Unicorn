@@ -123,10 +123,6 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitIgnore(AssembParser::IgnoreContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
   virtual antlrcpp::Any visitImm(AssembParser::ImmContext *ctx) override {
     return visitChildren(ctx);
   }

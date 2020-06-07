@@ -1,6 +1,7 @@
 #ifndef Unicorn_ELF
 #define Unicorn_ELF
 #include "defines.h"
+#include "riscv.h"
 
 /*-----------------------------------------------------------------------------*/
 // e_type
@@ -78,7 +79,7 @@ enum {
 	ELFABIVERSION_NONE = 0
 };
 
-typedef struct {
+struct Elf32_Ehdr{
 	Elf32_Byte  e_ident[16];  /* ELF identification */
 	Elf32_Half  e_type;              /* Object file type */
 	Elf32_Half  e_machine;           /* Machine type */
@@ -109,10 +110,10 @@ typedef struct {
 		it->e_shnum = Unicorn::bswap16(e_shnum);
 		it->e_shstrndx = Unicorn::bswap16(e_shstrndx);
 	}
-} Elf32_Ehdr;
+};
 /*-----------------------------------------------------------------------------*/
 // Elf32_Phdr
-typedef struct {
+struct Elf32_Phdr {
 	Elf32_Word  p_type;              /* Type of segment */
 	Elf32_Off   p_offset;            /* Offset in file */
 	Elf32_Addr  p_vaddr;             /* Virtual address in memory */
@@ -121,7 +122,7 @@ typedef struct {
 	Elf32_Word  p_memsz;             /* Size of segment in memory */ 
 	Elf32_Word  p_flags;             /* Segment attributes */
 	Elf32_Word  p_align;             /* Alignment of segment */
-} Elf32_Phdr;
+};
 /*-----------------------------------------------------------------------------*/
 // sh_name
 enum {
@@ -160,7 +161,7 @@ enum {
 	SHF_LINK_ORDER = 0x80,           /* Section has link ordering requirement with sh_link pointing to next section */
 };
 
-typedef struct {
+struct Elf32_Shdr{
 	Elf32_Word  sh_name;             /* Section name */
 	Elf32_Word  sh_type;             /* Section type */
 	Elf32_Word  sh_flags;            /* Section attributes */
@@ -183,7 +184,7 @@ typedef struct {
 		it->sh_addralign = Unicorn::bswap32(sh_addralign);
 		it->sh_entsize = Unicorn::bswap32(sh_entsize);
 	}
-} Elf32_Shdr;
+};
 /*-----------------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------------*/
 enum {
@@ -200,7 +201,10 @@ enum {
 	R_RISCV_LO12_S = 28,             /* 32, 11:0  Absolute address              %lo(symbol)          S-Type (sb,sh,sw,fsw,fsd) */
 	R_RISCV_RELAX = 51,              /*           Reloc pair can be relaxed */
 };
-typedef struct {
+#define ELF32_R_SYM(i)  (i >> 8)
+#define ELF32_R_TYPE(i)  (i & 0xff)
+#define ELF32_R_INFO(s, t)  ((s << 8) | (t & 0xff))
+struct Elf32_Rela{
 	Elf32_Addr	r_offset;	
 	Elf32_Word	r_info;
 	Elf32_Sword	r_addend;
@@ -209,7 +213,7 @@ typedef struct {
 		it->r_info = Unicorn::bswap32(r_info);
 		it->r_addend = Unicorn::bswap32(r_addend);
 	}
-} Elf32_Rela;
+};
 /*-----------------------------------------------------------------------------*/
 /*-----------------------------------------------------------------------------*/
 // st_info bind
@@ -252,7 +256,7 @@ enum {
 
 #define ELF32_ST_VISIBILITY(o) ((o)&0x3)	//only keep the last 2 bits
 //visibility: DEFAULT-0
-typedef struct {
+struct Elf32_Sym{
 	Elf32_Word	st_name;
     Elf32_Addr	st_value;
     Elf32_Word	st_size;
@@ -267,6 +271,6 @@ typedef struct {
 		it->st_other = st_other;
 		it->st_shndx = Unicorn::bswap16(st_shndx);
 	}
-} Elf32_Sym;
+};
 
 #endif

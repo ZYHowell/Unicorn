@@ -143,7 +143,7 @@ Notice: global variables in .bss is NOBITS so no space in the file.
 ```C
 typedef struct {
 	Elf32_Addr	r_offset;	
-    	//location at which to allpy the relocation action
+    	//location at which to apply the relocation action
     	//that is, the byte offset from the beginning of the section
 	Elf32_Word	r_info;
     	//the symbol table index of the symbol the reloction made

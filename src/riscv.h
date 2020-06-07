@@ -48,9 +48,9 @@ inline Elf32_Word ImmUformat(Elf32_Word origin) {
     return slice(origin, 31, 12);
 }
 inline Elf32_Word ImmJformat(Elf32_Word origin) {
-    return ((slice(origin, 20, 20) << 18) | 
-            (slice(origin, 10, 1) << 8) | 
-            (slice(origin, 11, 11) << 7) | 
+    return ((slice(origin, 20, 20) << 19) | 
+            (slice(origin, 10, 1) << 9) | 
+            (slice(origin, 11, 11) << 8) | 
             (slice(origin, 19, 12))
             ) & ((1 << 20) - 1);
 }
@@ -64,7 +64,7 @@ inline Elf32_Word addR2(Elf32_Word inst, Elf32_Word r2) {
     return apply(inst, r2, 20, 5);
 }
 inline Elf32_Word addIImm(Elf32_Word inst, Elf32_Word imm) {
-    return apply(inst, ImmIformat(imm), 12, 20);
+    return apply(inst, ImmIformat(imm), 20, 12);
 }
 inline Elf32_Word addSImm(Elf32_Word inst, Elf32_Word imm) {
     return apply(

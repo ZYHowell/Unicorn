@@ -95,9 +95,6 @@ public:
   virtual void enterFilename(AssembParser::FilenameContext *ctx) = 0;
   virtual void exitFilename(AssembParser::FilenameContext *ctx) = 0;
 
-  virtual void enterIgnore(AssembParser::IgnoreContext *ctx) = 0;
-  virtual void exitIgnore(AssembParser::IgnoreContext *ctx) = 0;
-
   virtual void enterImm(AssembParser::ImmContext *ctx) = 0;
   virtual void exitImm(AssembParser::ImmContext *ctx) = 0;
 

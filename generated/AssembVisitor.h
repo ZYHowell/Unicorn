@@ -73,8 +73,6 @@ public:
 
     virtual antlrcpp::Any visitFilename(AssembParser::FilenameContext *context) = 0;
 
-    virtual antlrcpp::Any visitIgnore(AssembParser::IgnoreContext *context) = 0;
-
     virtual antlrcpp::Any visitImm(AssembParser::ImmContext *context) = 0;
 
     virtual antlrcpp::Any visitRelocation(AssembParser::RelocationContext *context) = 0;

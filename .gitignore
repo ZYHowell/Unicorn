@@ -4,3 +4,7 @@ cmake_install.cmake
 CMakeCache.txt
 libantlr4-cpp-runtime.a
 Makefile
+*.log
+*.o
+*.s
+*.dump

@@ -97,9 +97,6 @@ public:
   virtual void enterFilename(AssembParser::FilenameContext * /*ctx*/) override { }
   virtual void exitFilename(AssembParser::FilenameContext * /*ctx*/) override { }
 
-  virtual void enterIgnore(AssembParser::IgnoreContext * /*ctx*/) override { }
-  virtual void exitIgnore(AssembParser::IgnoreContext * /*ctx*/) override { }
-
   virtual void enterImm(AssembParser::ImmContext * /*ctx*/) override { }
   virtual void exitImm(AssembParser::ImmContext * /*ctx*/) override { }
 

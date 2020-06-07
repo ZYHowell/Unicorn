@@ -27,14 +27,13 @@ pseudoInst
     ;
 
 directive
-    : Section                               #section
+    : '.section'? Section                   #section
     | '.globl' symbol=Symbol                #globl
     | '.type' symbol=Symbol ',' Type        #type
     | ('.p2align' | '.align') Integer       #align
     | '.word' Integer                       #word
     | ('.asciz' | '.string') StringLiteral  #asciz
     | '.file' name=StringLiteral            #filename
-    | IgnoreDirective                       #ignore
     ;
 
 Section: '.text' | '.bss' | '.rodata';
@@ -50,12 +49,13 @@ Lop: 'lb' | 'lh' | 'lw';
 Szop: 'seqz' | 'snez' | 'sgtz' | 'sltz';
 Bzop: 'beqz' | 'bnez' | 'bgtz' | 'bltz' | 'blez' | 'bgez';
 
-Reg: 'zero' | 'ra' | 'sp' | 'gp' | 'tp' | 't0' | 't1' | 't2' | 
+Reg: 'zero' | 'ra' | 'sp' | 'gp' | 'tp' | 't0' | 't1' | 't2' |
      's0' | 's1' | 'a0' | 'a1' | 'a2' | 'a3' | 'a4' | 'a5' | 'a6' | 'a7' |
-     's2' | 's3' | 's4' | 's5' | 's6' | 's7' | 's8' | 's9' | 's10' | 's11' | 
+     's2' | 's3' | 's4' | 's5' | 's6' | 's7' | 's8' | 's9' | 's10' | 's11' |
      't3' | 't4' | 't5' | 't6';
+Directive: '.section' | '.globl' | '.type' | '.p2align' | '.align' | '.word' | '.asciz' | '.string' | '.file';
 
-Symbol: [a-zA-Z_.][a-zA-Z_.0-9]*;
+Symbol: [a-zA-Z_.][a-zA-Z_.0-9$]*;
 
 StringLiteral: '"' SChar* '"';
 fragment
@@ -66,14 +66,12 @@ SChar
     | '\\"'
     ;
 
-
 imm: Integer | relocation;
 relocation: HL '(' Symbol ')';
 HL: ('%hi' | '%lo');
 
 Integer: DecimalInteger | ('-' DecimalInteger);
 DecimalInteger: [1-9] [0-9]* | '0';
-IgnoreDirective: '.' ~[\r\n]+;
 
 Whitespace
     :   [ \t]+

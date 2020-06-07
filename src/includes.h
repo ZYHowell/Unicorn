@@ -1,5 +1,7 @@
 #ifndef Unicorn_Includes_H
 #define Unicorn_Includes_H
+#include <iostream>
+#include <fstream>
 #include <vector>
 #include <string>
 #include <map>
@@ -10,8 +12,7 @@
 #include <string.h>
 #include <utility>
 
-#include "assert.h"
-#include "elf.h"
 #include "defines.h"
+#include "elf.h"
 #include "riscv.h"
 #endif
