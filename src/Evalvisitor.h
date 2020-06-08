@@ -40,7 +40,6 @@ private:
     using Any = antlrcpp::Any;
     using sec_p = std::pair<string, section_t*>;
     using sym_p = std::pair<string, symbol_t*>;
-    using rela_p = std::pair<string, Elf32_Rela*>;
 
     std::map<string, section_t*> sections;
     std::map<string, symbol_t*> symbols;
@@ -161,11 +160,13 @@ private:
     }
     inline Elf32_Word getRelaOf(string symbol, Elf32_Word rel_type) {
       Elf32_Rela rela;
+      memset(&rela, 0, sizeof(Elf32_Rela));
       rela.r_offset = cur_sec_off;
       rela.r_info = ELF32_R_INFO(symbols[symbol]->idx, rel_type);
       relocations.emplace_back(std::move(rela));
       if ((rel_type < 29 && rel_type > 22) || rel_type == 18) {
         Elf32_Rela relax;
+        memset(&relax, 0, sizeof(Elf32_Rela));
         relax.r_offset = cur_sec_off;
         relax.r_info = ELF32_R_INFO(0, R_RISCV_RELAX);
         relocations.emplace_back(std::move(relax));
@@ -183,10 +184,10 @@ private:
       tmp->header.sh_flags = SHF_ALLOC | SHF_EXECINSTR;
       tmp->header.sh_addralign = 4;
       sections.insert(std::pair<string, section_t*>(".text", tmp));
-      tmp = new section_t();
-      tmp->header.sh_type = SHT_RELA;
-      tmp->header.sh_flags = SHF_INFO_LINK;
-      sections.insert(std::pair<string, section_t*>(".rela.text", tmp));
+      // tmp = new section_t();
+      // tmp->header.sh_type = SHT_RELA;
+      // tmp->header.sh_flags = SHF_INFO_LINK;
+      // sections.insert(std::pair<string, section_t*>(".rela.text", tmp));
       tmp = new section_t();
       tmp->header.sh_type = SHT_NOBITS;
       tmp->header.sh_flags = SHF_ALLOC | SHF_WRITE;
@@ -199,10 +200,10 @@ private:
       tmp->header.sh_type = SHT_PROGBITS;
       tmp->header.sh_flags = SHF_ALLOC | SHF_WRITE;
       sections.insert(std::pair<string, section_t*>(".data", tmp));
-      tmp = new section_t();
-      tmp->header.sh_type = SHT_PROGBITS;
-      tmp->header.sh_flags = SHF_MERGE | SHF_STRINGS;
-      sections.insert(std::pair<string, section_t*>(".comment", tmp));
+      // tmp = new section_t();
+      // tmp->header.sh_type = SHT_PROGBITS;
+      // tmp->header.sh_flags = SHF_MERGE | SHF_STRINGS;
+      // sections.insert(std::pair<string, section_t*>(".comment", tmp));
     }
     inline void alloc() {
       section_order.push_back("");
@@ -380,7 +381,7 @@ private:
       ehdr.e_phoff = 0;
       ehdr.e_flags = 0;
       ehdr.e_ehsize = sizeof(Elf32_Ehdr);
-      ehdr.e_phentsize = sizeof(Elf32_Phdr);
+      //ehdr.e_phentsize = sizeof(Elf32_Phdr);
       ehdr.e_phnum = 0;
       ehdr.e_shentsize = sizeof(Elf32_Shdr);
       ehdr.e_shnum = section_order.size();
@@ -414,12 +415,22 @@ private:
         shdr.sh_name = shstr_con.size();
         for (auto c : name)
           shstr_con.push_back(std::byte(c));
-        if (shdr.sh_addralign > 0)
-          storage.resize(alignOffset(storage.size(), shdr.sh_addralign));
-        shdr.sh_offset = storage.size();
-        shdr.sh_size = sec->contents.size();
-        storage.resize(storage.size() + shdr.sh_size);
       }
+      for (size_t round = 0;round < 2;++round){
+        for (auto name : section_order) {
+          section_t *sec = sections[name];
+          Elf32_Shdr &shdr = sec->header;
+          if ((name != ".rela.text" && name != ".shstrtab") ^ ((bool)round)) {
+            if (shdr.sh_addralign > 0)
+              storage.resize(alignOffset(storage.size(), shdr.sh_addralign));
+            shdr.sh_offset = storage.size();
+            shdr.sh_size = sec->contents.size();
+            storage.resize(storage.size() + shdr.sh_size);
+          }
+        }
+      }
+      
+      memset(&(sections[""]->header), 0, sizeof(Elf32_Shdr));
       storage.resize(alignOffset(storage.size(), 4));
       ehdr.e_shoff = storage.size();
       storage.resize(storage.size() + section_order.size() * sizeof(Elf32_Shdr));
